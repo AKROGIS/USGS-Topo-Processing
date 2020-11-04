@@ -35,7 +35,7 @@ def get_folder_names(files, kind):
 
 
 def main():
-    for topo_folder, topo_ext in folder_to_fix:
+    for topo_folder, topo_ext in folders_to_fix:
         if not os.path.isdir(topo_folder):
             print('Could not find the folder: "{0}", Skipping'.format(topo_folder))
         else:

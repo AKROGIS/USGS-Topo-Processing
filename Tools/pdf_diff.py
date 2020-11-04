@@ -26,15 +26,20 @@ def file_map(folder):
 def Compare_folders(f1, f2):
     folders = file_map(f2)
     for filename1 in os.listdir(f1):
+        if filename1 not in folders:
+            print("new:{0}".format(filename1))
+            continue
         folder = os.path.join(f2, folders[filename1])
         # print(f2, folder)
         filename2 = os.path.join(folder, filename1)
         # print(filename1, filename2)
         if not os.path.exists(filename2):
-            print("{0} not found in {1}".format(filename1, folder))
+            print("ERROR:{0} not found in {1}".format(filename1, folder))
             continue
-        if md5(os.path.join(f1,filename1)) != md5(filename2):
-            print("File {0} does not match".format(filename1))
+        if md5(os.path.join(f1,filename1)) == md5(filename2):
+            print("dup:{0}".format(filename1))
+        else:
+            print("update:{0}".format(filename1))
 
 if __name__ == '__main__':
     if (len(sys.argv) != 3
