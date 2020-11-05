@@ -53,3 +53,6 @@
   - run batch file
 * repeat for all 8 batch files
   - each batch file will take about 5-15 minutes per line. if there are only a few files to process, then fewer batch files may be better.
+* when done, close all but one command window
+* In the remainng command window run `add_pyramids.bat`
+   - takes about 5 seconds per file to finish.
