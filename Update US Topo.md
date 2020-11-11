@@ -56,3 +56,85 @@
 * when done, close all but one command window
 * In the remainng command window run `add_pyramids.bat`
    - takes about 5 seconds per file to finish.
+* Run `compare_trees.py` on X:\....\GeoPDF and working GeoPDF folders
+* Run `compare_trees.py` on X:\....\GeoTIFF and working GeoTIFF folders to get a list of duplicates
+  - use this list to make a list of filepaths as input to the next step
+  - needs a header line for the next step (see IFSAR processing instructions)
+* copy, edit and run `pds-reorg\build_mosaics.py` to add new files to mosaic
+
+* If new topos were added (skip if only changes were updated topos)
+  * repair footprints
+    - footprints of newly added rasters will include the entire image, which includes
+      the white area around the image for the marginalia.  This step will set
+      the footprint of each raster to the extents of the map content in the image.
+    - Right click, Modify->Import Footprints or Boundary... 
+      - target: Footprints
+      - Target Join Field: Name
+      - Input: `Indexes\MAPINDICES_Alaska_State_GDB.gdb\Cells\CellGrid_7_5minute
+      - Input Join Field: cell_name
+  * Update boundary
+    - Must be done after the footprints have been repaired.
+    - In ArcCatalog, right click on mosaic, select Modify -> Build Boundary...
+  * fix maxPS
+    - In ArcMap, edit the footprints and set `MaxPS = 40` for all source tiles.
+      This will set a scale of 1:151,181 to switch from overviews to source
+      tiles. A larger HighPS is possible due to the internal pyramids, but that
+      will require loading too many source tiles when zoomed out.
+  * Update Overviews
+    - If you made a copy, fix the paths of the writable copy of the overviews
+      - right click, `Modify` -> `Repair...` and replace the X drive path to the
+        overviews to the writable copy.
+    - You cannot Define and Build overviews in one step,  because despite the options
+        to only updated the stale and new it will recreate all.
+    - Define Overviews
+      - **Do not** use `Optimize` -> `Define Overviews...` in the context menu
+      - Use `Optimize` -> `Build Overviews...` in the context menu with the
+        following options:
+      - Define Missing Overview Tiles (optional): ON
+      - Generate Overviews (optional): OFF
+      - Generate Missing Overview Images Only (optional): ON
+      - Generate Stale Overview Images Only (optional): ON
+      - The second two will be grayed out, when the second option is off,
+        but I think they still apply.
+    - Use ArcMap to find existing overviews that need to be updated
+      - Use the graphic selection tool to Select the area of the new tiles.
+        This may need to be multiple selections. Be sure to get right up to the edge
+        of the existing tiles (the edge of some overviews may be very close to a base tile)
+        - A trick is to select all the new (non overview) raster, and export to a separate feature class.
+          Then unselect, and select all of the old overviews. If this is not easy to
+          do in the attribute table, do it by "select by attribute" where name like 'Ov%' and
+          Category <> 3. Then select by location, from the selected set the footprints
+          that intersect the exported FC of new raster footprints.
+      - Start an edit session.
+      - Open the attribute table, and filter to only selected features.
+      - The features should be in OID order. Scroll from the bottom (New overviews last, new
+        base tiles next).  Any overviews selected above that should be highlighted.
+        Do not highlight any base tiles (check the name).
+      - Click the button to reselect the highlighted tiles.  Only the old overviews that overlap
+        the new base tiles should now be selected.
+      - right click on the Category column header, and Calc the field to set Category = 3.
+      - Save edits and close ArcMap
+    - Build Overviews for new overviews
+      - Use `Optimize` -> `Build Overviews...` in the context menu with the
+        following options:
+      - Query Definition (optional): `Category = 3`
+      - Define Missing Overview Tiles (optional): OFF
+      - Generate Overviews (optional): ON
+      - Generate Missing Overview Images Only (optional): ON
+      - Generate Stale Overview Images Only (optional): ON
+    - Copy new overviews to the server
+      - Check the file count.  IN many cases, there are mask files that are
+        deleted in the local copy, and they need to be deletd from the server
+        overview folder.
+    - right click, `Modify` -> `Repair...` and replace the C drive path to the
+        overviews to X drive overviews.
+    - delete or rename the C drive overview folder, and test the mosaic.
+      If all is well, then copy mosaic GDB to the server.
+
+Initially Need to add some columns
+  * right click on mosaic in ArcCatalog and selct Properties...
+  * Click on Fields tab and add 4 columns
+    - CreateDate - Date
+    - MapYear - Source Integer
+    - SourcePDS - text(300)
+    - SourceAWS - text(300)
