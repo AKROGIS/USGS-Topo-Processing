@@ -1,3 +1,10 @@
+'''
+Reads a USGS database snapshot and creates lists of Alaska Topo Maps
+
+Edit the CONFIG object to set execution options and change assumptions
+Works with Python 2 and 3
+'''
+
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 import csv
@@ -11,9 +18,9 @@ CONFIG = {
     'work_folder': '/Users/regan/MyRepos/USGS-Topo-Processing',
     # The USGS database snapshot from the downloaded zip file
     'usgs_file': 'Scratch/topomaps_all.csv',
-    
+
     # Set to True if you want to scan the usgs_file for all values in one or more columns.
-    # Useful for validating CONFIG options before making lists. 
+    # Useful for validating CONFIG options before making lists.
     'print_domains': False,
     # domain_names: a list of field names to inspect/print range of values
     # domain_filter: an AND list of name and values that must match to consider row
@@ -21,12 +28,12 @@ CONFIG = {
     # 'domain_filter': None,
     # 'domain_names': ['Primary State'],
     ### Check the range of key columns for Alaskan maps
-    'domain_filter': [('Primary State','AK')],
+    'domain_filter': [('Primary State', 'AK')],
     'domain_names': ['Series', 'Version', 'Scale'],
 
     # Set to True if you want to check that the urls in usgs_file match the map name.
     'check_urls': False,
-    'check_filter': [('Primary State','AK')],
+    'check_filter': [('Primary State', 'AK')],
 
     # Set to False if you do not want to create the various lists (useful when checking the domains)
     'make_lists': True,
@@ -41,10 +48,10 @@ CONFIG = {
     'map_name_column_name': 'Map Name',
     'scale_column_name': 'Scale',
     'url_column_name': 'Download Product S3',
-    # topo_filter is a list of columns and column values that must match to be a US Topo file we want
-    'topo_filter': [('Primary State','AK'), ('Series', 'US Topo')],
-    # htmc_filter is a list of columns and column values that must match to be a historical topo file we want
-    'htmc_filter': [('Primary State','AK'), ('Series', 'HTMC')],
+    # topo_filter is a list of columns and values that must match to be a US Topo file we want
+    'topo_filter': [('Primary State', 'AK'), ('Series', 'US Topo')],
+    # htmc_filter is a list of columns and values that must match to be a HTMC topo file we want
+    'htmc_filter': [('Primary State', 'AK'), ('Series', 'HTMC')],
 
     # list files to create
     # *_metadata is a CSV file with all columns for all topo maps of type *
@@ -52,18 +59,18 @@ CONFIG = {
     # The list of new/updated US Topo Maps for Alaska
     'topo_metadata': 'all_metadata_topo.csv',
     'topo_urls': 'new_downloads_topo.txt',
-     # The list of new/updated Historic Quarter-Quad maps for Alaska
-     # Any HTMC topo with a scale less than max_qq_scale will be considered quarter quad (QQ) topo
+    # The list of new/updated Historic Quarter-Quad maps for Alaska
+    # Any HTMC topo with a scale less than max_qq_scale will be considered quarter quad (QQ) topo
     'max_qq_scale': 30000,
     'qq_metadata': 'all_metadata_qq.csv',
     'qq_urls': 'new_downloads_qq.txt',
-   # The list of new/updated Historic Quarter-Million maps for Alaska
-     # Any HTMC topo with a scale greater than min_qm_scale will be considered quarter million (QM) topo
+    # The list of new/updated Historic Quarter-Million maps for Alaska
+    # Any HTMC topo with a scale more than min_qm_scale will be considered quarter million (QM) topo
     'min_qm_scale': 200000,
     'qm_metadata': 'all_metadata_qm.csv',
     'qm_urls': 'new_downloads_qm.txt',
     # The list of new/updated Historic Inch-To-Mile maps for Alaska
-     # Any HTMC topo that is not a QQ or QM topo will be considered inch to the mile (ITM) topo
+    # Any HTMC map that is not a QQ or QM topo will be considered inch to the mile (ITM) topo
     'itm_metadata': 'all_metadata_itm.csv',
     'itm_urls': 'new_downloads_itm.txt',
 
@@ -77,22 +84,25 @@ CONFIG = {
     'pds_root': 'X:\\Extras\\AKR\\Charts\\USGS_Topo',
     # The PDS has standard names for the folders for each type of topo map
     # this is used with pds_root to determine the full path to each topo map.
-    'folder': {'topo': 'Current_GeoPDF', 'qq': 'Historic_QQ', 'qm': 'Historic_QM', 'itm': 'Historic_ITM'},
+    'folder': {
+        'topo': 'Current_GeoPDF', 'qq': 'Historic_QQ',
+        'qm': 'Historic_QM', 'itm': 'Historic_ITM'
+    },
 }
 
 
-def skip(row, filter):
+def skip(row, row_filter):
     """
     Return true if this row should be ignored.
 
-    if filter is None or an empty dictionary, return False
-    filter should be a dictionary<Int,String>
+    if row_filter is None or an empty dictionary, return False
+    row_filter should be a dictionary<Int,String>
     if row[Int] == String then do not skip
     """
-    if not filter:
+    if not row_filter:
         return False
-    for index in filter:
-        if row[index] != filter[index]:
+    for index in row_filter:
+        if row[index] != row_filter[index]:
             return True
     return False
 
@@ -100,10 +110,10 @@ def skip(row, filter):
 def print_domains():
     """Prints all values found in selected columns.  See CONFIG for details."""
 
-    allfile = os.path.join(CONFIG['work_folder'],CONFIG['usgs_file'])
+    allfile = os.path.join(CONFIG['work_folder'], CONFIG['usgs_file'])
     column_names = CONFIG['domain_names']
     domain_filter = CONFIG['domain_filter']
-    filter = {}
+    row_filter = {}
     domains = [{'name': name, 'index': -1, 'values': set()} for name in set(column_names)]
     with open(allfile) as in_file:
         csvreader = csv.reader(in_file)
@@ -117,11 +127,11 @@ def print_domains():
             for name, value in domain_filter:
                 try:
                     index = header.index(name)
-                    filter[index] = value
+                    row_filter[index] = value
                 except ValueError:
                     pass
         for row in csvreader:
-            if not skip(row, filter):
+            if not skip(row, row_filter):
                 for domain in domains:
                     if domain['index'] >= 0:
                         domain['values'].add(row[domain['index']])
@@ -139,39 +149,39 @@ def check_urls():
     """
     Checks that the map name is in the url
 
-    In HTMC Maps, space are replaced by '%20', Periods(.) are removed, 
+    In HTMC Maps, space are replaced by '%20', Periods(.) are removed,
       and ampersands(&) are replaced by 'and'
     In US Topo Maps, spaces are replaced by '_'
     """
-    allfile = os.path.join(CONFIG['work_folder'],CONFIG['usgs_file'])
+    allfile = os.path.join(CONFIG['work_folder'], CONFIG['usgs_file'])
     check_filter = CONFIG['check_filter']
-    filter = {}
+    row_filter = {}
     with open(allfile) as in_file:
         csvreader = csv.reader(in_file)
         header = next(csvreader)
         try:
             url_index = header.index(CONFIG['url_column_name'])
-        except:
+        except ValueError:
             print('ERROR: URL column not found. Bailing!')
             return
         try:
             map_name_index = header.index(CONFIG['map_name_column_name'])
-        except:
+        except ValueError:
             print('ERROR: Map name column not found. Bailing!')
             return
         if check_filter:
             for name, value in check_filter:
                 try:
                     index = header.index(name)
-                    filter[index] = value
+                    row_filter[index] = value
                 except ValueError:
                     pass
         for row in csvreader:
-            if not skip(row, filter):
+            if not skip(row, row_filter):
                 url = row[url_index]
                 map_name = row[map_name_index]
-                topo_name = map_name.replace(' ','_')
-                htmc_name = map_name.replace(' ','%20').replace('&','and').replace('.','')
+                topo_name = map_name.replace(' ', '_')
+                htmc_name = map_name.replace(' ', '%20').replace('&', 'and').replace('.', '')
                 file_name = os.path.basename(url)
                 if topo_name not in file_name and htmc_name not in file_name:
                     print("MISMATCH: {0} != {1}".format(map_name, file_name))
@@ -182,9 +192,9 @@ def htmc_pdf_to_tif(url):
     Converts historic PDF URLs to TIFF URLs
 
     The database list contains only URLs to GeoPDFs, however the maps are also available as GeoTIFFs
-    The GeoTIFF URLS were (are?) available from the NationalMap Viewer, and still exist for download.
-    While the GeoPDFs may be nice in some cases, the GeoTIFFs require no processing to incorporate into
-    our Mosaics.
+    The GeoTIFF URLS were (are?) available from the NationalMap Viewer, and still exist for download
+    While the GeoPDFs may be nice in some cases, the GeoTIFFs require no processing to incorporate
+    into our Mosaics.
 
     https://prd-tnm.s3.amazonaws.com/StagedProducts/Maps/HistoricalTopo/PDF/AK/24000/AK_Beechey%20Point%20B-3%20SE_353562_1970_24000_geo.pdf
 
@@ -200,10 +210,6 @@ def htmc_pdf_to_tif(url):
     return new_url
 
 
-def aws_url_to_pds_path(url):
-    """Converts an Amazon S3 URL to a path on the PDS (X drive)."""
-
-
 def map_folder(map_name):
     """
     Returns the name of the parent folder that a map will live in.
@@ -212,10 +218,10 @@ def map_folder(map_name):
     i.e. "Baird Inlet C-3" -> "Baird Inlet".
     """
     regex = CONFIG['folder_regex']
-    name = map_name.replace('.','')
+    name = map_name.replace('.', '')
     try:
         return regex.search(name).group(1)
-    except:
+    except AttributeError:
         print("WARNING: Unable to determine folder name for {0}".format(map_name))
         return None
 
@@ -233,12 +239,12 @@ def is_new_row(row):
         return True
     datefield = row[CONFIG['date_column_index']]
     try:
-        month,day,year = datefield.split('/')
+        month, day, year = datefield.split('/')
         date = datetime.date(int(year), int(month), int(day))
         return date >= CONFIG['since_date']
-    except:
+    except ValueError:
         return True
-    
+
 
 def patch_header(header):
     """Adds additional columns to a US Topo Header."""
@@ -252,7 +258,7 @@ def patch_row(row, url, kind):
         if CONFIG['map_name_column_index'] is not None:
             map_name = row[CONFIG['map_name_column_index']]
             folder = map_folder(map_name)
-    
+
     pds_path = None
     if url is not None:
         root = CONFIG['pds_root']
@@ -274,7 +280,6 @@ def make_lists():
     htmc_filter = CONFIG['htmc_filter']
     htmc_filter_indexes = {}
     scale_index = -1
-    map_index = -1
     url_index = -1
     allfile = os.path.join(CONFIG['work_folder'], CONFIG['usgs_file'])
     if CONFIG['list_folder'] is None:
@@ -296,19 +301,24 @@ def make_lists():
     datestamp_file = os.path.join(list_folder, CONFIG['datestamp'])
     try:
         with open(datestamp_file, 'r') as datestamp_h:
-            CONFIG['since_date'] = datetime.date.fromisoformat(datestamp_h.readline())
-    except:
+            line = datestamp_h.readline()
+            # requires python 3.7+
+            #date = datetime.date.fromisoformat(line)
+            year, month, day = line.split('-')
+            date = datetime.date(int(year), int(month), int(day))
+            CONFIG['since_date'] = date
+    except (IOError, ValueError):
         print("WARNING: Unable to get the last processing date from {0}".format(datestamp_file))
 
     with open(allfile) as all_h, \
-    open(topo_urls,'w') as topo_urls_h, \
-    open(topo_metadata,'w') as topo_meta_h, \
-    open(qq_urls,'w') as qq_urls_h, \
-    open(qq_metadata,'w') as qq_meta_h, \
-    open(qm_urls,'w') as qm_urls_h, \
-    open(qm_metadata,'w') as qm_meta_h, \
-    open(itm_urls,'w') as itm_urls_h, \
-    open(itm_metadata,'w') as itm_meta_h:
+    open(topo_urls, 'w') as topo_urls_h, \
+    open(topo_metadata, 'w') as topo_meta_h, \
+    open(qq_urls, 'w') as qq_urls_h, \
+    open(qq_metadata, 'w') as qq_meta_h, \
+    open(qm_urls, 'w') as qm_urls_h, \
+    open(qm_metadata, 'w') as qm_meta_h, \
+    open(itm_urls, 'w') as itm_urls_h, \
+    open(itm_metadata, 'w') as itm_meta_h:
         csv_reader = csv.reader(all_h)
         csv_writer_topo_meta = csv.writer(topo_meta_h)
         csv_writer_qq_meta = csv.writer(qq_meta_h)
@@ -355,7 +365,6 @@ def make_lists():
         csv_writer_itm_meta.writerow(new_header)
 
         for row in csv_reader:
-            folder = None
             url = None
             if not skip(row, topo_filter_indexes):
                 if url_index >= 0:
@@ -366,7 +375,7 @@ def make_lists():
             elif not skip(row, htmc_filter_indexes):
                 try:
                     scale = int(row[scale_index])
-                except:
+                except (ValueError, KeyError):
                     scale = 63360
                 url = None
                 if url_index >= 0 and is_new_row(row):
