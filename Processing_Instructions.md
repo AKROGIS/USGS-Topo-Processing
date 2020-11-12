@@ -105,13 +105,11 @@ subsequent scripts.
 ## TO DO
 
 1) make_alaska_lists.py
-   - special case for Solomon and Casadepaga; Map Name = folder name
-   - replace %20 with space in historic topp PDS path
-   - Add Raster Name Field
-   - Change Name of columns PDS Path, AWS URL
+   - Verify code to create "Raster Name" and "PDS Path" matches existing files on X drive
 2) Create make_folders.py
 3) Fix organize_downloads.py (was arrange_topos.py)
 4) Create compare_pds_to_metadata.py; Compare PDS Path Column to PDS folders
 5) Cleanup build and run GDAL scripts
+   - build from columns in metadata
 6) Cleanup compare_trees.py script
 7) Breakup Readme.md to Folder_Descriptions.md and Initial_Processing_History.md

@@ -79,7 +79,10 @@ CONFIG = {
     # with the domain_filter of [('Primary State','AK'), ('Series', 'HTMC')]
     'historic_scales': [24000, 25000, 250000, 50000, 62500, 63360],
     # folder_regex is a regular expression to extract the base (folder) name from the map name
+    # This matches all but a few special cases covered in the map_folder() function.
     'folder_regex': re.compile(r'([A-Za-z ]+) [A-D]-[0-8].*'),
+    # A regular expression for breaking a geoPDF filename into parts for building the simple .tif file name
+    'geopdf_regex': re.compile(r'AK_([A-Za-z_]+)_([A-D]-[0-8])_([SN][WE]|OE_[EWNS_]*)_[0-9]{8}_TM_geo\.pdf'),
     # The Alaska Region PDS (X drive) folder where the USGS topo maps will be permanently archived.
     'pds_root': 'X:\\Extras\\AKR\\Charts\\USGS_Topo',
     # The PDS has standard names for the folders for each type of topo map
@@ -222,8 +225,20 @@ def map_folder(map_name):
     try:
         return regex.search(name).group(1)
     except AttributeError:
-        print("WARNING: Unable to determine folder name for {0}".format(map_name))
-        return None
+        # special cases where Map Name is unusual (returns the map name as the folder name)
+        if name in ['Solomon', 'Casadepaga']:
+            return name
+        else:
+            print("WARNING: Unable to determine folder name for {0}".format(map_name))
+            return None
+
+
+def tiffname_from_pdfname(name):
+    regex = CONFIG['geopdf_regex']
+    match = regex.search(name)
+    basename = match.group(1).replace('_', ' ')
+    oe_spec = match.group(3).replace('_', ' ')
+    return "{0} {1} {2}.tif".format(basename, match.group(2), oe_spec)
 
 
 def is_new_row(row):
@@ -248,7 +263,7 @@ def is_new_row(row):
 
 def patch_header(header):
     """Adds additional columns to a US Topo Header."""
-    return header + ["Map Folder", "AWS Source", "PDS Source"]
+    return header + ["Map Folder", "Raster Name", "AWS URL", "PDS Path"]
 
 
 def patch_row(row, url, kind):
@@ -260,16 +275,23 @@ def patch_row(row, url, kind):
             folder = map_folder(map_name)
 
     pds_path = None
+    raster_name = None
     if url is not None:
         root = CONFIG['pds_root']
         kind_folder = CONFIG['folder'][kind]
         file_name = os.path.basename(url)
+        if kind == 'topo':
+            tif_name = tiffname_from_pdfname(file_name)
+            raster_name, _ = raster_name, _= os.path.splitext(tif_name)
+        else:
+            file_name = file_name.replace('%20',' ')
+            raster_name, _ = os.path.splitext(file_name)
         if folder is None:
             pds_path = os.path.join(root, kind_folder, file_name)
         else:
             pds_path = os.path.join(root, kind_folder, folder, file_name)
 
-    return row + [folder, url, pds_path]
+    return row + [folder, raster_name, url, pds_path]
 
 
 def make_lists():
@@ -378,19 +400,20 @@ def make_lists():
                 except (ValueError, KeyError):
                     scale = 63360
                 url = None
-                if url_index >= 0 and is_new_row(row):
+                new_row = is_new_row(row)
+                if url_index >= 0:
                     url = htmc_pdf_to_tif(row[url_index])
                 if scale < CONFIG['max_qq_scale']:
                     csv_writer_qq_meta.writerow(patch_row(row, url, 'qq'))
-                    if url is not None:
+                    if url is not None and new_row:
                         qq_urls_h.write(url + "\n")
                 elif scale > CONFIG['min_qm_scale']:
                     csv_writer_qm_meta.writerow(patch_row(row, url, 'qm'))
-                    if url is not None:
+                    if url is not None and new_row:
                         qm_urls_h.write(url + "\n")
                 else:
                     csv_writer_itm_meta.writerow(patch_row(row, url, 'itm'))
-                    if url is not None:
+                    if url is not None and new_row:
                         itm_urls_h.write(url + "\n")
 
     # write the processing datestamp
