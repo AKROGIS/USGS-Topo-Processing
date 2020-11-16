@@ -104,10 +104,10 @@ subsequent scripts.
 
 ## TO DO
 
-1) make_alaska_lists.py
+1) make_alaska_lists.py/compare_pds_to_metadata.py
+   - Compare PDS Path Column to PDS folders
    - Verify code to create "Raster Name" and "PDS Path" matches existing files on X drive
 3) Fix organize_downloads.py (was arrange_topos.py)
-4) Create compare_pds_to_metadata.py; Compare PDS Path Column to PDS folders
 5) Cleanup build and run GDAL scripts
    - build from columns in metadata
 6) Cleanup compare_trees.py script
