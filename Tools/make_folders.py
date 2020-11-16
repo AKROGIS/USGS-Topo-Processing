@@ -27,7 +27,7 @@ CONFIG = {
     'create_folders': True,
     # The list of folders to clear/create; will be done in the work_folder
     'folder_list': [
-        'CurrentGeoPDF', 'CurrentGeoTIF', 'Historical_QM', 'Historical_ITM', 'Historical_QQ',
+        'CurrentGeoPDF', 'CurrentGeoTIFF', 'Historical_QM', 'Historical_ITM', 'Historical_QQ',
         'Scratch', 'Downloads'
     ],
     # The list of sub-folders to clear/create in the download folder
