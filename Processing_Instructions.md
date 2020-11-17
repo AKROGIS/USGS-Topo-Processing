@@ -23,9 +23,14 @@ it is possible that USGS might update a map's metadata without updating the
 map.  Therefore it might be beneficial to update all records with the latest
 database download, even if the map itself did not change.
 
-1) Create a working directory (e.g. `C:\tmp\topo`). Referred to as `WD` below.
-   - Clone or refresh repo to working directory
-   - Run script to create working folders
+1) Clone (or refresh) the git repository to a working directory
+   - https://github.com/AKROGIS/USGS-Topo-Processing
+   - The working directory (e.g. `C:\tmp\topo`) is eferred to as `WD` below.
+   - The working directory should be on a fast local volume with 10s of free GB
+     - Each topo map is at least 10MB, and there may be 1000 or more to process.
+   - Check/Edit `working_folder` in the `CONFIG` object in `Tools\make_folders.py`
+   - Check the other parameters in the `CONFIG` object.
+   - Run the script `Tools\make_folders.py`to create working folders
 2) Download the USGS database snapshot.
    - URL: http://thor-f5.er.usgs.gov/ngtoc/metadata/misc/topomaps_all.zip
    - Referencing web page (as of Nov. 2020):
