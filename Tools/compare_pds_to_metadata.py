@@ -26,8 +26,8 @@ import os
 CONFIG = {
     # The working folder where input/output files can be found
     # This is the root folder of the cloned code repository.
-    # 'work_folder': r'C:\tmp\topo',
-    'work_folder': '/Users/regan/MyRepos/USGS-Topo-Processing',
+    'work_folder': 'B:\\work\\USGS-Topo-Processing',
+    # 'work_folder': '/Users/regan/MyRepos/USGS-Topo-Processing',
     # metadata_folder is where the metadata files exist
     # if None, the metadata files are assumed to be in the work_folder
     'metadata_folder': 'Indexes',

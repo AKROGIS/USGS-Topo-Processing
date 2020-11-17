@@ -15,7 +15,7 @@ import re
 
 CONFIG = {
     # The working folder where input/output files can be found
-    'work_folder': r'B:\work\USGS-Topo-Processing',
+    'work_folder': 'B:\\work\\USGS-Topo-Processing',
     #'work_folder': '/Users/regan/MyRepos/USGS-Topo-Processing',
     # The USGS database snapshot from the downloaded zip file
     'usgs_file': 'Scratch/topomaps_all.csv',
@@ -85,7 +85,7 @@ CONFIG = {
     # A regular expression for breaking a geoPDF filename into parts for building the simple .tif file name
     'geopdf_regex': re.compile(r'AK_([A-Za-z_]+)_([A-D]-[0-8])_([SN][WE]|OE_[EWNS_]*)_[0-9]{8}_TM_geo\.pdf'),
     # The Alaska Region PDS (X drive) folder where the USGS topo maps will be permanently archived.
-    'pds_root': 'X:\\Extras\\AKR\\Charts\\USGS_Topo',
+    'pds_root': 'X:\\Extras\\AKR\\Statewide\\Charts\\USGS_Topo',
     # The PDS has standard names for the folders for each type of topo map
     # this is used with pds_root to determine the full path to each topo map.
     'folder': {
