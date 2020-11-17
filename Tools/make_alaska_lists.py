@@ -14,8 +14,8 @@ import re
 
 CONFIG = {
     # The working folder where input/output files can be found
-    # 'work_folder': r'C:\tmp\topo',
-    'work_folder': '/Users/regan/MyRepos/USGS-Topo-Processing',
+    'work_folder': r'B:\work\USGS-Topo-Processing',
+    #'work_folder': '/Users/regan/MyRepos/USGS-Topo-Processing',
     # The USGS database snapshot from the downloaded zip file
     'usgs_file': 'Scratch/topomaps_all.csv',
 
@@ -334,13 +334,13 @@ def make_lists():
 
     with open(allfile) as all_h, \
     open(topo_urls, 'w') as topo_urls_h, \
-    open(topo_metadata, 'w') as topo_meta_h, \
+    open(topo_metadata, 'wb') as topo_meta_h, \
     open(qq_urls, 'w') as qq_urls_h, \
-    open(qq_metadata, 'w') as qq_meta_h, \
+    open(qq_metadata, 'wb') as qq_meta_h, \
     open(qm_urls, 'w') as qm_urls_h, \
-    open(qm_metadata, 'w') as qm_meta_h, \
+    open(qm_metadata, 'wb') as qm_meta_h, \
     open(itm_urls, 'w') as itm_urls_h, \
-    open(itm_metadata, 'w') as itm_meta_h:
+    open(itm_metadata, 'wb') as itm_meta_h:
         csv_reader = csv.reader(all_h)
         csv_writer_topo_meta = csv.writer(topo_meta_h)
         csv_writer_qq_meta = csv.writer(qq_meta_h)

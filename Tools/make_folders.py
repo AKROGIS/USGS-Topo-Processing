@@ -15,8 +15,8 @@ import shutil
 CONFIG = {
     # The working folder where input/output files can be found
     # This is the root folder of the cloned code repository.
-    # 'work_folder': r'C:\tmp\topo',
-    'work_folder': '/Users/regan/MyRepos/USGS-Topo-Processing',
+    'work_folder': r'B:\work\USGS-Topo-Processing',
+    #'work_folder': '/Users/regan/MyRepos/USGS-Topo-Processing',
     # Should any existing subfolder be deleted?
     # Typically set to True, however False bay be helpful during testing,
     # or in atypical situations.
