@@ -10,6 +10,12 @@ processing scripts change.
 This script prints to the standard output (usually the terminal window):
  - a list of "Extra Paths"; paths in metadata but no matching file in the PDS.
  - a list of "Extra Files"; files in the PDS, but no matching path in the metadata.
+
+ There is a special case in the code for Bradfield Canal in get_paths_and_folders().
+ Some of the maps/paths in the metadata have an uppercase C in the last folder
+ name, while some have a lower case c.  However Windows is case sensitive, 
+ so there is only one folder (with an upper case c).  Python string compares
+ are case sensitive, so there are unexpected mismatches without the special case.
 '''
 
 from __future__ import absolute_import, division, print_function, unicode_literals
@@ -65,16 +71,16 @@ def check_metadata_paths():
     pds_files = get_pds_files(pds_folders)
     extra_paths = metadata_paths - pds_files
     if len(extra_paths):
-        print("Extra Paths (in metadata, but not PDS)")
         for path in sorted(list(extra_paths)):
             print(path)
+        print("{0} Extra Paths (in metadata, but not PDS)".format(len(extra_paths)))
     else:
         print("Woot, Woot!, No Extra Paths")
     extra_files = pds_files - metadata_paths
     if len(extra_files):
-        print("Extra Files (in PDS but not metadata)")
         for path in sorted(list(extra_files)):
             print(path)
+        print("{0} Extra Files (in PDS but not metadata)".format(len(extra_files)))
     else:
         print("Woot, Woot!, No Extra Files")
 
@@ -87,7 +93,7 @@ def get_paths_and_folders():
     root = CONFIG['work_folder'] 
     metadata_folder = os.path.join(root, CONFIG['metadata_folder'])
     for metadata in CONFIG['metadata_files']:
-        file_name = metadata['name']
+        file_name = metadata['file']
         file_path = os.path.join(metadata_folder, file_name)
         path_column = metadata['column']
         with open(file_path) as in_file:
@@ -111,6 +117,11 @@ def get_paths_and_folders():
             for row in csvreader:
                 path = row[path_index]
                 folder = os.path.dirname(path)
+                # Special case for Bradfield Canal; Some paths are upper case C some are not
+                if folder.endswith('ITM\\Bradfield canal'):
+                    path = path.replace('ITM\\Bradfield canal', 'ITM\\Bradfield Canal')
+                    folder = folder.replace('d canal', 'd Canal')
+                # End Special case
                 metadata_paths.add(path)
                 pds_folders.add(folder)
                 if raster is not None:
@@ -128,9 +139,14 @@ def get_pds_files(folders):
     
     paths = set()
     for folder in folders:
-        for dir, files, _ in os.walk(folder):
-            for file in files:
-                path = os.path.join(dir, file)
+        for cdir, _, files in os.walk(folder):
+            for filename in files:
+                # skip world files; required to correct georeferencing
+                if filename.endswith('.tfwx'):
+                    continue
+                if filename.endswith('.tif.aux.xml'):
+                    continue
+                path = os.path.join(cdir, filename)
                 paths.add(path)
 
     return paths
