@@ -1,15 +1,75 @@
+"""
+This script moves new topo maps into the appropriate sub folder.
+
+The sub folder is the base name of the topo (typically the 1:250k name)
+if the sub folder does not exist it is created.
+it can be run after an initial bulk download, or an incremental update. 
+
+Warning; this script uses hard coded relative paths,
+and must be run in the 'USGS_Topos' folder.
+
+Assumes python 2.7
+"""
+
 from __future__ import absolute_import, division, print_function, unicode_literals
+
 import os
 import re
 
-# Assumes python 2.7
-# This script moves new topo maps into the appropriate sub folder.
-# The sub folder is the base name of the topo (typically the 1:250k name)
-# if the sub folder does not exist it is created.
-# it can be run after an initial bulk download, or an incremental update. 
-# 
-# Warning; this script uses hard coded relative paths,
-# and must be run in the 'USGS_Topos' folder.
+CONFIG = {
+    # The working folder where input/output files can be found
+    # This is the root folder of the cloned code repository.
+    'work_folder': 'B:\\work\\USGS-Topo-Processing',
+    # 'work_folder': '/Users/regan/MyRepos/USGS-Topo-Processing',
+    # metadata_folder is where the metadata files exist
+    # if None, the metadata files are assumed to be in the work_folder
+    'metadata_folder': 'Indexes',
+
+    'download_folders': 'Downloads',
+    'pds_folders': None,
+
+    # downloaded files to move
+    # file is the name of the file
+    # column is the name of the column with a PDS path
+    # raster is the name of the column with the raster name.  It should only
+    # be used with the list of current topos, and is used to check the list of
+    # raster files generated from the list of GeoPDFs (in column)
+    'moves': [
+        {
+            'dowload_folder': 'ITM',
+            'pds_folder': 'Historic_ITM',
+            'subfolder_name': {
+                'column': 'Map Folder',
+                'metadata': 'all_metadata_itm.csv'
+            }
+        },
+        {
+            'dowload_folder': 'QM',
+            'pds_folder': 'Historic_QM',
+            'subfolder_name': None
+        },
+        {
+            'dowload_folder': 'QQ',
+            'pds_folder': 'Historic_QQ',
+            'subfolder_name': None
+        },
+        {
+            'dowload_folder': 'TOPO',
+            'pds_folder': 'Current_GeoPDF',
+            'subfolder_name': {
+                'column': 'Map Folder',
+                'metadata': 'all_metadata_topo.csv'
+            }
+        }
+    ]
+}
+
+
+"""
+for all files in QQ and QM move to 
+for all files in ITM move to Historic
+"""
+
 folders_to_fix = [('Historic_ITM','.itf'), ('Current_GeoPDF','.pdf')]
 
 def get_folder_names(files, kind):

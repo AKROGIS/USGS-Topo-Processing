@@ -53,7 +53,22 @@ database download, even if the map itself did not change.
        previously downloaded.
    - Run `WD\Tools\make_alaska_lists.py` to create the download lists and
      metadata records for the mosaics.
-6) Update the repo.
+6) Check the metadata against PDS and download lists
+  - Check and update the `CONFIG` object at the beginning of
+    `WD\Tools\compare_pds_to_metadata.py`
+  - Run `WD\Tools\compare_pds_to_metadata.py` to move the files.
+  - There should be no **Extra Files (in PDS but not metadata)**
+  - Everything in **Extra Paths (in metadata, but not PDS)** except
+    the paths in `Current_GeoTIFF` sould be in one of the
+    `WD\Indexes\new_downloads_*.txt` files.  If this is not the case, then
+    something has gone wrong.  This problem should be investigated and
+    resolved beore continuing.
+  - Possible sources of error include (by likelihood):
+    - The `CONFIG` parameters in `WD\Tools\make_alaska_lists.py`.
+    - Other assumptions in `WD\Tools\make_alaska_lists.py`.
+    - Changes (deleting or renaming files) on the PDS since the last processing.
+    - Changes in the structure or semantics of the USGS database
+7) Update the repo.
    The previous step will update various files in the `WD\Indexes` folder
    This history is retained in the repository.  Use git (or GitHub app) to
    commit and push the changes. You can use the git commit log to see the
@@ -64,8 +79,10 @@ database download, even if the map itself did not change.
 The previous step generated several lists of download URLs for new/updated
 topo maps.  These lists can be used to download individual files in a web
 browse, or automated with uGET, curl, or a custom script.  These instructions
-assume you are using [uGET](https://sourceforge.net/projects/urlget/) which is an application that does not require admin permissions.  See the
-[USGS uGET page](https://viewer.nationalmap.gov/uget-instructions/) for additional instructions on installing and using uGET (ignore the instructions
+assume you are using [uGET](https://sourceforge.net/projects/urlget/)
+which is an application that does not require admin permissions.  See the
+[USGS uGET page](https://viewer.nationalmap.gov/uget-instructions/)
+for additional instructions on installing and using uGET (ignore the instructions
 for "Preparing Input Text File" as that was done in the previous step).
 
 Each of the download lists (if not empty) should be downloaded to a
@@ -80,8 +97,16 @@ subsequent scripts.
 
 ## Process
 
-- Put topos in correct folder structure
-- Convert GeoPDFs to GeoTIFFs
+1) Put topos in correct folder structure
+
+This will move the files in the various `WD\Download` folders to 
+the PDS folder structure in `WD`
+
+  - Check and update the `CONFIG` object at the beginning of
+    `WD\Tools\arrange_topos.py`
+  - Run `WD\Tools\arrange_topos.py` to move the files.
+
+2) Convert GeoPDFs to GeoTIFFs
 
 ## Check
 
