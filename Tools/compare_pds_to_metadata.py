@@ -11,11 +11,12 @@ This script prints to the standard output (usually the terminal window):
  - a list of "Extra Paths"; paths in metadata but no matching file in the PDS.
  - a list of "Extra Files"; files in the PDS, but no matching path in the metadata.
 
- There is a special case in the code for Bradfield Canal in get_paths_and_folders().
+ There is a special case in the code for Bradfield Canal (ITM) in get_paths_and_folders().
  Some of the maps/paths in the metadata have an uppercase C in the last folder
  name, while some have a lower case c.  However Windows is case sensitive, 
  so there is only one folder (with an upper case c).  Python string compares
  are case sensitive, so there are unexpected mismatches without the special case.
+ Same is true of the Lime Hills (Current GeoPDF); LIme Hilss <\!= Lime Hills
 '''
 
 from __future__ import absolute_import, division, print_function, unicode_literals
@@ -37,7 +38,6 @@ CONFIG = {
     # raster is the name of the column with the raster name.  It should only
     # be used with the list of current topos, and is used to check the list of
     # raster files generated from the list of GeoPDFs (in column)
-
     'metadata_files': [
         {
             'file': 'all_metadata_topo.csv',
@@ -45,7 +45,7 @@ CONFIG = {
             'raster': {
                 'column': 'Raster Name',
                 'extension': '.tif',
-                'path_transform' : ('CurrentGeoPDF', 'CurrentGeoTIFF')
+                'path_transform' : ('Current_GeoPDF', 'Current_GeoTIFF')
             }
         },
         {
@@ -70,17 +70,17 @@ def check_metadata_paths():
     metadata_paths, pds_folders = get_paths_and_folders()
     pds_files = get_pds_files(pds_folders)
     extra_paths = metadata_paths - pds_files
-    if len(extra_paths):
+    if extra_paths:
+        print("{0} Extra Paths (in metadata, but not PDS)".format(len(extra_paths)))
         for path in sorted(list(extra_paths)):
             print(path)
-        print("{0} Extra Paths (in metadata, but not PDS)".format(len(extra_paths)))
     else:
         print("Woot, Woot!, No Extra Paths")
     extra_files = pds_files - metadata_paths
-    if len(extra_files):
+    if extra_files:
+        print("{0} Extra Files (in PDS but not metadata)".format(len(extra_files)))
         for path in sorted(list(extra_files)):
             print(path)
-        print("{0} Extra Files (in PDS but not metadata)".format(len(extra_files)))
     else:
         print("Woot, Woot!, No Extra Files")
 
@@ -121,6 +121,10 @@ def get_paths_and_folders():
                 if folder.endswith('ITM\\Bradfield canal'):
                     path = path.replace('ITM\\Bradfield canal', 'ITM\\Bradfield Canal')
                     folder = folder.replace('d canal', 'd Canal')
+                # Special case for Lime Hills; Some paths are upper case I some are not
+                if folder.endswith('GeoPDF\\Lime Hills'):
+                    path = path.replace('GeoPDF\\Lime Hills', 'GeoPDF\\LIme Hills')
+                    folder = folder.replace('GeoPDF\\Lime Hills', 'GeoPDF\\LIme Hills')
                 # End Special case
                 metadata_paths.add(path)
                 pds_folders.add(folder)
