@@ -2,7 +2,8 @@
 Reads a USGS database snapshot and creates lists of Alaska Topo Maps
 
 Edit the CONFIG object to set execution options and change assumptions
-Works with Python 2 and 3
+
+Requires Python 3.0+
 '''
 
 from __future__ import absolute_import, division, print_function, unicode_literals
@@ -332,15 +333,20 @@ def make_lists():
     except (IOError, ValueError):
         print("WARNING: Unable to get the last processing date from {0}".format(datestamp_file))
 
+    # When writing a CSV file how it is opened is different on OS/versions
+    # open(file_name, 'w') works on 2 and 3 on a Mac
+    # python on windows will add an extra newline after every data line, to avoid this:
+    # open(file_name, 'wb') is required on Windows w/ Python 2.x
+    # open(filename, 'w', newline='') is required on Windows w/ Python 3.x 
     with open(allfile) as all_h, \
     open(topo_urls, 'w') as topo_urls_h, \
-    open(topo_metadata, 'wb') as topo_meta_h, \
+    open(topo_metadata, 'w', newline='') as topo_meta_h, \
     open(qq_urls, 'w') as qq_urls_h, \
-    open(qq_metadata, 'wb') as qq_meta_h, \
+    open(qq_metadata, 'w', newline='') as qq_meta_h, \
     open(qm_urls, 'w') as qm_urls_h, \
-    open(qm_metadata, 'wb') as qm_meta_h, \
+    open(qm_metadata, 'w', newline='') as qm_meta_h, \
     open(itm_urls, 'w') as itm_urls_h, \
-    open(itm_metadata, 'wb') as itm_meta_h:
+    open(itm_metadata, 'w', newline='') as itm_meta_h:
         csv_reader = csv.reader(all_h)
         csv_writer_topo_meta = csv.writer(topo_meta_h)
         csv_writer_qq_meta = csv.writer(qq_meta_h)
