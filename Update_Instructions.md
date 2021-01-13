@@ -1,6 +1,6 @@
 # USGS Topo Map Processing Instructions
 
-These instructions are for updating the USGS Topo map library
+These instructions are for updating the USGS topographic map library
 and mosaics maintained in the Alaska GIS PDS.  These instructions
 look for changes by the USGS since the last time this process was
 run and update the published products accordingly.
@@ -23,28 +23,37 @@ it is possible that USGS might update a map's metadata without updating the
 map.  Therefore it might be beneficial to update all records with the latest
 database download, even if the map itself did not change.
 
-1) Clone (or refresh) the git repository to a working directory
-   - https://github.com/AKROGIS/USGS-Topo-Processing
-   - The working directory (e.g. `C:\tmp\topo`) is eferred to as `WD` below.
+1. Clone (or refresh) the git repository to a working directory
+
+   - <https://github.com/AKROGIS/USGS-Topo-Processing>
+   - The working directory (e.g. `C:\tmp\topo`) is referred to as `WD` below.
    - The working directory should be on a fast local volume with 10s of free GB
-     - Each topo map is at least 10MB, and there may be 1000 or more to process.
-   - Check/Edit `working_folder` in the `CONFIG` object in `Tools\make_folders.py`
+     - Each map is at least 10MB, and there may be 1000 or more to process.
+   - Check/Edit `working_folder` in the `CONFIG` object in
+     `Tools\make_folders.py`
    - Check the other parameters in the `CONFIG` object.
    - Run the script `Tools\make_folders.py`to create working folders
-2) Download the USGS database snapshot.
-   - URL: http://thor-f5.er.usgs.gov/ngtoc/metadata/misc/topomaps_all.zip
+
+2. Download the USGS database snapshot.
+
+   - URL: <http://thor-f5.er.usgs.gov/ngtoc/metadata/misc/topomaps_all.zip>
    - Referencing web page (as of Nov. 2020):
-     https://www.usgs.gov/core-science-systems/ngp/tnm-delivery/topographic-maps
-3) Unzip the download to the `WD\Scratch` folder
+     <https://www.usgs.gov/core-science-systems/ngp/tnm-delivery/topographic-maps>
+
+3. Unzip the download to the `WD\Scratch` folder
+
    - There should be 3 files in this folder (1 readme, and 2 CSV files)
-4) Check the check the `Change History:` at the end of `WD\Scratch\readme.txt`
-   in the unzip folder for changes that might effect the scripts.
-   For example adding or deleting columns in the data file.  If there have
-   been changes, then any of the scripts below may fail.  If so, then the scripts
-   will need to be updated to reflect the changes. In most cases, there is a
-   `CONFIG` object at the beginning of the script that contains assumptions about
-   the database.  Most changes can be made per the comments in the `CONFIG` object.
-5) Make the download lists
+
+4. Check the check the `Change History:` at the end of `WD\Scratch\readme.txt`
+   in the unzip folder for changes that might effect the scripts. For example
+   adding or deleting columns in the data file.  If there have been changes,
+   then any of the scripts below may fail.  If so, then the scripts will need
+   to be updated to reflect the changes. In most cases, there is a `CONFIG`
+   object at the beginning of the script that contains assumptions about the
+   database. Most changes can be made per the comments in the `CONFIG` object.
+
+5. Make the download lists
+
    - Check and update the `CONFIG` object at the beginning of
      `WD\Tools\make_alaska_lists.py`
    - Check the file containing the date of the last processing.
@@ -53,22 +62,26 @@ database download, even if the map itself did not change.
        previously downloaded.
    - Run `WD\Tools\make_alaska_lists.py` to create the download lists and
      metadata records for the mosaics.
-6) Check the metadata against PDS and download lists
-  - Check and update the `CONFIG` object at the beginning of
-    `WD\Tools\compare_pds_to_metadata.py`
-  - Run `WD\Tools\compare_pds_to_metadata.py` to move the files.
-  - There should be no **Extra Files (in PDS but not metadata)**
-  - Everything in **Extra Paths (in metadata, but not PDS)** except
-    the paths in `Current_GeoTIFF` sould be in one of the
-    `WD\Indexes\new_downloads_*.txt` files.  If this is not the case, then
-    something has gone wrong.  This problem should be investigated and
-    resolved beore continuing.
-  - Possible sources of error include (by likelihood):
-    - The `CONFIG` parameters in `WD\Tools\make_alaska_lists.py`.
-    - Other assumptions in `WD\Tools\make_alaska_lists.py`.
-    - Changes (deleting or renaming files) on the PDS since the last processing.
-    - Changes in the structure or semantics of the USGS database
-7) Update the repo.
+
+6. Check the metadata against PDS and download lists
+
+   - Check and update the `CONFIG` object at the beginning of
+     `WD\Tools\compare_pds_to_metadata.py`
+   - Run `WD\Tools\compare_pds_to_metadata.py` to move the files.
+   - There should be no **Extra Files (in PDS but not metadata)**
+   - Everything in **Extra Paths (in metadata, but not PDS)** except
+     the paths in `Current_GeoTIFF` should be in one of the
+     `WD\Indexes\new_downloads_*.txt` files.  If this is not the case, then
+     something has gone wrong.  This problem should be investigated and
+     resolved before continuing.
+   - Possible sources of error include (by likelihood):
+     - The `CONFIG` parameters in `WD\Tools\make_alaska_lists.py`.
+     - Other assumptions in `WD\Tools\make_alaska_lists.py`.
+     - Changes (deleting or renaming files) on the PDS since the last
+       processing.
+     - Changes in the structure or semantics of the USGS database
+
+7. Update the repo.
    The previous step will update various files in the `WD\Indexes` folder
    This history is retained in the repository.  Use git (or GitHub app) to
    commit and push the changes. You can use the git commit log to see the
@@ -82,8 +95,9 @@ browse, or automated with uGET, curl, or a custom script.  These instructions
 assume you are using [uGET](https://sourceforge.net/projects/urlget/)
 which is an application that does not require admin permissions.  See the
 [USGS uGET page](https://viewer.nationalmap.gov/uget-instructions/)
-for additional instructions on installing and using uGET (ignore the instructions
-for "Preparing Input Text File" as that was done in the previous step).
+for additional instructions on installing and using uGET (ignore the
+instructions for "Preparing Input Text File" as that was done in the previous
+step).
 
 Each of the download lists (if not empty) should be downloaded to a
 separate folder for processing. The following are suggested folder names.
@@ -97,16 +111,16 @@ subsequent scripts.
 
 ## Process
 
-1) Put topos in correct folder structure
+1. Put topos in correct folder structure
 
-This will move the files in the various `WD\Download` folders to 
-the PDS folder structure in `WD`
+   This will move the files in the various `WD\Download` folders to
+   the PDS folder structure in `WD`
 
-  - Check and update the `CONFIG` object at the beginning of
-    `WD\Tools\arrange_topos.py`
-  - Run `WD\Tools\arrange_topos.py` to move the files.
+   - Check and update the `CONFIG` object at the beginning of
+     `WD\Tools\arrange_topos.py`
+   - Run `WD\Tools\arrange_topos.py` to move the files.
 
-2) Convert GeoPDFs to GeoTIFFs
+2. Convert GeoPDFs to GeoTIFFs
 
 ## Check
 
@@ -134,11 +148,11 @@ the PDS folder structure in `WD`
 
 ## TO DO
 
-1) make_alaska_lists.py/compare_pds_to_metadata.py
-   - Compare PDS Path Column to PDS folders
-   - Verify code to create "Raster Name" and "PDS Path" matches existing files on X drive
-3) Fix organize_downloads.py (was arrange_topos.py)
-5) Cleanup build and run GDAL scripts
-   - build from columns in metadata
-6) Cleanup compare_trees.py script
-7) Breakup Readme.md to Folder_Descriptions.md and Initial_Processing_History.md
+- `make_alaska_lists.py`/`compare_pds_to_metadata.py`
+  - Compare PDS Path Column to PDS folders
+  - Verify code to create "Raster Name" and "PDS Path" matches existing files
+    on X drive.
+- Fix `organize_downloads.py` (was `arrange_topos.py`)
+- Cleanup build and run GDAL scripts
+  - build from columns in metadata
+- Cleanup `compare_trees.py` script

@@ -1,46 +1,49 @@
-USGS Topographic Maps
-=====================
+# USGS Topographic Maps
 
-This folder contains Topographic Maps from USGS and related data.
+This folder contains Topographic Maps from USGS and related files.
+These data are primarily snapshots of files available from the
+[National Map](https://viewer.nationalmap.gov). See
+[Initial_Process_Instruction](./Initial_Process_Instructions.md) for details
+on how these files were initially collected and processed. See
+[Update_Instructions](Update_Instructions.md) for how they are maintained.
 
-Created by: Regan Sarwas, Alaska NPS GIS Team
-Last Edited: 2020-01-06
+Created by: Regan Sarwas, Alaska NPS GIS Team.
+Last Edited: 2021-01-13.
 
-These data are primarily snapshots of files available
-from the [National Map](https://viewer.nationalmap.gov).
+*The master copy of the documents and scripts in this folder is at
+<https://github.com/AKROGIS/USGS-Topo-Processing>.  The Github repository
+does not contain the PDF and GeoTIFF files nor the file geodatabase.*
 
-**The historic maps are in NAD27, while the current maps and the
-Indexes are in NAD83**
+**NOTE:** Most historic maps are in NAD27, while the current maps and the
+Indexes are in NAD83.
 
-Current_GeoPDF
---------------
-These files are the modern 1:25k topo maps of Alaska downloaded from the
-national map, and then organized into sub folders.  There may be multiple
+## Current_GeoPDF
+
+These files are the modern 1:25k PDF topographic maps of Alaska downloaded from
+the national map, and then organized into sub folders.  There may be multiple
 versions of a map (the published date is encoded in the file name).
 The base of the file name matches the names in the `cell_name` column
 of the geodatabase in the `Indexes` folder.  The indexes provide a clipping
 polygon for each map. The filename (cell_name) may not match the historic
 names, for example Mt McKinley was rename Denali in August of 2015. Additional
 metadata for each file is in the list of the national map search results in the
-`Indexes` folder. See the _Processing Notes_ section below for details on how
-these files were collected and maintained.
+`Indexes` folder.
 
-Current_GeoTIFF
----------------
-The files in this folder are geoTIFF files created with GDAL from the contents
-of the `Current_GeoPDF` folder. The geoTIFFs are RGB images at 600dpi.
-They do not include the imagery, PLSS, other grids, or marginalia available
-in the PDF version.  This folder only includes the most recent PDF files.
-They are created for use in a statewide mosaic. The organization mimics
-the organization in the Current_GeoPDF. As the contents of the Current_GeoPDF
+## Current_GeoTIFF
+
+The files in this folder are geoTIFF files created with [GDAL](https://gdal.org)
+from the contents of the `Current_GeoPDF` folder. The geoTIFFs are RGB images at
+600dpi. They do not include the imagery, PLSS, other grids, or marginalia
+available in the PDF version.  This folder only includes the most recent PDF
+files. They are created for use in a statewide mosaic. The organization mimics
+the organization in the `Current_GeoPDF`. As the contents of the `Current_GeoPDF`
 folder are updated, this folder should also be updated.  To allow the mosaic
 to stay current without re-adding source rasters, the geoTIFFs have dropped
 the date from the filename.  Each file should reflect the most current data
-for that tile.  See the Processing Notes section below for details on how
-these files were created and maintained.
+for that tile.
 
-Historical_ITM
---------------
+## Historical_ITM
+
 This folder contains historical quadrangle (quad) maps with an extents of
 15 x 15 minutes or 16th of a 1 x 1 degree cell. These maps are also know as
 inch to mile (itm), because most are at a scale of 1:63360 or 1 inch = 1 mile.
@@ -52,11 +55,9 @@ The file name only includes the original publication date, so additional data
 needed to differentiate and categorize maps with the same extents is maintained
 in the file called `itm_data.csv` in the `Indexes` folder. Additional metadata
 for each file is in the national map search results in the `Indexes` folder.
-See the _Processing Notes_ section below for details on how these files were
-collected and maintained.
 
-Historical_QM
--------------
+## Historical_QM
+
 This folder contains historical quadrangle (quad) maps with an extents of
 of 1x1, 1x2, 1x3, or 1x4 degrees depending on latitude (typical 1x2 degrees).
 These maps are also know as quarter million quads (qm) because all are at a
@@ -68,11 +69,10 @@ of the printed product. The file name only includes the original publication
 date, so additional data needed to differentiate and categorize maps with the
 same extents is maintained in the file called `qm_data.csv` in the `Indexes`
 folder. Additional metadata for each file is in the national map search results
-in the `Indexes` folder. See the _Processing Notes_ section below for details
-on how these files were collected and maintained.
+in the `Indexes` folder.
 
-Historical_QQ
--------------
+## Historical_QQ
+
 This folder contains historical quadrangle (quad) maps with an extents of
 of 7.5 x 7.5 minutes, or one quarter of a standard (itm) quad map, hence the
 nickname quarter-quad (qq). These maps are scanned (300dpi) geoTIFF files
@@ -83,12 +83,13 @@ color gamut of the printed product. The file name only includes the original
 publication date, so additional data needed to differentiate and categorize
 maps with the same extents is maintained in the file called `qq_data.csv` in
 the `Indexes` folder. Additional metadata for each file is in the national map
-search results in the `Indexes` folder. See the _Processing Notes_ section
-below for details on how these files were collected and maintained.
+search results in the `Indexes` folder.
 
-Indexes
--------
-* MAPINDICES_Alaska_State_GDB.gdb - A file geodatabase downloaded from the
+## Indexes
+
+**NOTE** This section needs to be updated.
+
+* `MAPINDICES_Alaska_State_GDB.gdb` - A file geodatabase downloaded from the
   National Map, that has the polygon extents (footprint) for data portion of
   each map (i.e. it excludes the marginalia). See the metadata for the date
   of the data.  Typically the `cell name` matches the root filename of the maps.
@@ -97,11 +98,17 @@ Indexes
   with the historic map (in NAD27).  See the section on _Processing Notes_ for
   details.  In addition, the polygon extents are "nominal", i.e. they do not
   include data that "bleeds into the marginalia" on some maps.
-* MAPINDICES_Alaska_State_GDB.xml - FGDC Metadata for the database.
+* `MAPINDICES_Alaska_State_GDB.xml` - FGDC Metadata for the database.
 * NPS_Processing_Data.gdb - Created to hold the NAD27 version of the Footprints.  
   See the section on _Historic Footprints_ below.
-* {itm|qq|qm}_data.csv - files with filename attributes separated into columns
+* `{itm|qq|qm}_data.csv` - files with filename attributes separated into columns
   as well as manually collected data (print date, etc) to help categorize and
   select the best available among multiple versions of a map.
-* nationalmap_search_results*.csv - search results from the national map
+* `nationalmap_search_results*.csv` - search results from the national map
   that provide the source URL and additional metadata for each downloaded file.
+
+## Tools
+
+Scripts for updating the contents of the above folders and other derived
+products with updated data from the USGS.  See the Readme in this folder for
+additional details.
