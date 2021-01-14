@@ -11,30 +11,36 @@ import sys
 # Warning; this script uses hard coded relative paths,
 # and must be run in the 'USGS_Topos' folder.
 
-pdf_root_folder = 'Current_GeoPDF'
-tif_root_folder = 'Current_GeoTIFF'
-output_script = 'maketifs.bat'
+pdf_root_folder = "Current_GeoPDF"
+tif_root_folder = "Current_GeoTIFF"
+output_script = "maketifs.bat"
 
-regex = re.compile(r'AK_([A-Za-z_]+)_([A-D]-[0-8])_([SN][WE]|OE_[EWNS_]*)_[0-9]{8}_TM_geo\.pdf')
+regex = re.compile(
+    r"AK_([A-Za-z_]+)_([A-D]-[0-8])_([SN][WE]|OE_[EWNS_]*)_[0-9]{8}_TM_geo\.pdf"
+)
 cmd = 'gdal_translate --config GDAL_PDF_DPI 600 --config GDAL_PDF_LAYERS_OFF "Barcode,Map_Collar,Images,Map_Frame.Terrain.Shaded_Relief,Map_Frame.Projection_and_Grids" -of GTIFF -co COMPRESS=deflate "{0}" "{1}"'
 
 
 def tifname_from_pdfname(name):
     match = regex.search(name)
-    basename = match.group(1).replace('_', ' ')
-    oe_spec = match.group(3).replace('_', ' ')
+    basename = match.group(1).replace("_", " ")
+    oe_spec = match.group(3).replace("_", " ")
     return "{0} {1} {2}.tif".format(basename, match.group(2), oe_spec)
 
 
 def main():
-    with open(output_script, 'w') as fh:
+    with open(output_script, "w") as fh:
         if not os.path.isdir(pdf_root_folder):
             print('Could not find the folder: "{0}", Aborting'.format(pdf_root_folder))
             sys.exit(1)
         if not os.path.isdir(tif_root_folder):
             print('Could not find the folder: "{0}", Aborting'.format(pdf_root_folder))
             sys.exit(1)
-        sub_folders = [f for f in os.listdir(pdf_root_folder) if os.path.isdir(os.path.join(pdf_root_folder,f))]
+        sub_folders = [
+            f
+            for f in os.listdir(pdf_root_folder)
+            if os.path.isdir(os.path.join(pdf_root_folder, f))
+        ]
         # print(sub_folders)
         for folder in sub_folders:
             pdf_folder = os.path.join(pdf_root_folder, folder)
@@ -42,7 +48,7 @@ def main():
             try:
                 os.mkdir(tif_folder)
             except OSError as ex:
-                if os.path.exists(tif_folder):  
+                if os.path.exists(tif_folder):
                     pass
                 else:
                     raise ex
@@ -62,5 +68,5 @@ def main():
                 fh.write(cmd.format(pdfpath, tifpath) + "\n")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
