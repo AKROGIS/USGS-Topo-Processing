@@ -82,7 +82,8 @@ CONFIG = {
     # folder_regex is a regular expression to extract the base (folder) name from the map name
     # This matches all but a few special cases covered in the map_folder() function.
     'folder_regex': re.compile(r'([A-Za-z ]+) [A-D]-[0-8].*'),
-    # A regular expression for breaking a geoPDF filename into parts for building the simple .tif file name
+    # A regular expression for breaking a geoPDF filename into parts for building the
+    # simple .tif file name
     'geopdf_regex': re.compile(r'AK_([A-Za-z_]+)_([A-D]-[0-8])_([SN][WE]|OE_[EWNS_]*)_[0-9]{8}_TM_geo\.pdf'),
     # The Alaska Region PDS (X drive) folder where the USGS topo maps will be permanently archived.
     'pds_root': 'X:\\Extras\\AKR\\Statewide\\Charts\\USGS_Topo',
@@ -229,12 +230,12 @@ def map_folder(map_name):
         # special cases where Map Name is unusual (returns the map name as the folder name)
         if name in ['Solomon', 'Casadepaga']:
             return name
-        else:
-            print("WARNING: Unable to determine folder name for {0}".format(map_name))
-            return None
+        print("WARNING: Unable to determine folder name for {0}".format(map_name))
+        return None
 
 
 def tiffname_from_pdfname(name):
+    """ Returns the name of the GeoTIFF file given the name of the GeoPDF file. """
     regex = CONFIG['geopdf_regex']
     match = regex.search(name)
     basename = match.group(1).replace('_', ' ')
@@ -283,9 +284,9 @@ def patch_row(row, url, kind):
         file_name = os.path.basename(url)
         if kind == 'topo':
             tif_name = tiffname_from_pdfname(file_name)
-            raster_name, _ = raster_name, _= os.path.splitext(tif_name)
+            raster_name, _ = os.path.splitext(tif_name)
         else:
-            file_name = file_name.replace('%20',' ')
+            file_name = file_name.replace('%20', ' ')
             raster_name, _ = os.path.splitext(file_name)
         if folder is None:
             pds_path = os.path.join(root, kind_folder, file_name)
@@ -337,7 +338,7 @@ def make_lists():
     # open(file_name, 'w') works on 2 and 3 on a Mac
     # python on windows will add an extra newline after every data line, to avoid this:
     # open(file_name, 'wb') is required on Windows w/ Python 2.x
-    # open(filename, 'w', newline='') is required on Windows w/ Python 3.x 
+    # open(filename, 'w', newline='') is required on Windows w/ Python 3.x
     with open(allfile) as all_h, \
     open(topo_urls, 'w') as topo_urls_h, \
     open(topo_metadata, 'w', newline='') as topo_meta_h, \

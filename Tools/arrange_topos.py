@@ -3,7 +3,7 @@ This script moves new topo maps into the appropriate sub folder.
 
 The sub folder is the base name of the topo (typically the 1:250k name)
 if the sub folder does not exist it is created.
-it can be run after an initial bulk download, or an incremental update. 
+it can be run after an initial bulk download, or an incremental update.
 
 Warning; this script uses hard coded relative paths,
 and must be run in the 'USGS_Topos' folder.
@@ -66,11 +66,11 @@ CONFIG = {
 
 
 """
-for all files in QQ and QM move to 
+for all files in QQ and QM move to
 for all files in ITM move to Historic
 """
 
-folders_to_fix = [('Historic_ITM','.itf'), ('Current_GeoPDF','.pdf')]
+folders_to_fix = [('Historic_ITM', '.itf'), ('Current_GeoPDF', '.pdf')]
 
 def get_folder_names(files, kind):
     if kind == '.tif':
@@ -84,7 +84,7 @@ def get_folder_names(files, kind):
             folder = regex.search(filename).group(1)
         except AttributeError:
             print("WARNING: Unable to determine folder name for {0}".format(filename))
-            folder = None 
+            folder = None
         if folder is not None:
             if kind == '.pdf':
                 folder = folder.replace('_', ' ')
@@ -111,13 +111,13 @@ def main():
                 try:
                     os.mkdir(folder)
                 except OSError as ex:
-                    if os.path.exists(folder):  
+                    if os.path.exists(folder):
                         pass
                     else:
                         raise ex
                 for name in files:
                     src = os.path.join(topo_folder, name)
-                    dst = os.path.join(folder,name)
+                    dst = os.path.join(folder, name)
                     # print("    Moving {0} to {1}.".format(src, dst))
                     try:
                         os.rename(src, dst)

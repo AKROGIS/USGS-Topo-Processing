@@ -1,5 +1,5 @@
 '''
-Checks the PDS (X Drive) paths in the metadata files 
+Checks the PDS (X Drive) paths in the metadata files
 
 The metadata files are created with `make_alaska_lists.py` and they
 contain paths to the permanent resources on the PDS.  These paths should
@@ -13,7 +13,7 @@ This script prints to the standard output (usually the terminal window):
 
  There is a special case in the code for Bradfield Canal (ITM) in get_paths_and_folders().
  Some of the maps/paths in the metadata have an uppercase C in the last folder
- name, while some have a lower case c.  However Windows is case sensitive, 
+ name, while some have a lower case c.  However Windows is case sensitive,
  so there is only one folder (with an upper case c).  Python string compares
  are case sensitive, so there are unexpected mismatches without the special case.
  Same is true of the Lime Hills (Current GeoPDF); LIme Hills != Lime Hills
@@ -90,7 +90,7 @@ def get_paths_and_folders():
 
     metadata_paths = set()
     pds_folders = set()
-    root = CONFIG['work_folder'] 
+    root = CONFIG['work_folder']
     metadata_folder = os.path.join(root, CONFIG['metadata_folder'])
     for metadata in CONFIG['metadata_files']:
         file_name = metadata['file']
@@ -99,10 +99,11 @@ def get_paths_and_folders():
         with open(file_path) as in_file:
             csvreader = csv.reader(in_file)
             header = next(csvreader)
+            message = "WARNING: Column '{0}' not found in {1}. Skipping."
             try:
                 path_index = header.index(path_column)
             except ValueError:
-                print("WARNING: Column '{0}' not found in {1}. Skipping.".format(path_column, file_name))
+                print(message.format(path_column, file_name))
                 continue
             try:
                 raster = metadata['raster']
@@ -112,7 +113,7 @@ def get_paths_and_folders():
                 try:
                     raster['index'] = header.index(raster['column'])
                 except ValueError:
-                    print("WARNING: Column '{0}' not found in {1}. Skipping.".format(raster['column'], file_name))
+                    print(message.format(raster['column'], file_name))
                     raster = None
             for row in csvreader:
                 path = row[path_index]
@@ -140,7 +141,7 @@ def get_paths_and_folders():
 
 def get_pds_files(folders):
     """Returns a set of unique file paths in the set of folders."""
-    
+
     paths = set()
     for folder in folders:
         for cdir, _, files in os.walk(folder):
