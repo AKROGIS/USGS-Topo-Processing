@@ -59,17 +59,14 @@ see the [Update Instructions](Update_Instructions.md).
 ## Additional tools
 
 Tools that may yet be of value if they are cleaned up and documented in the
-process steps.
+process steps.  The first update (end of 2020) was an ad hoc effort that
+used a number of small scripts (below) that eventually made it into a few
+well documented maintainable scripts (above).
 
 * `compare_trees.py`
 
   Compares the local directories to the PDS directories, and prints a
   list of files that are new, deleted, and updated.
-
-* `fixme.py`
-
-  Another tool to compare the local file system against a list of files and
-  the PDS.
 
 * `pdf_diffs.py`
 
@@ -78,12 +75,3 @@ process steps.
   updated, however this may mean that only the metadata was updated
   while the PDF content is unchanged.  This will identify "updated"
   topos that actually have no change to the PDF file.
-
-* `remove_dups.py`
-
-  Uses the status file from `pdf_diffs.py` and deletes local files
-  that are duplicate of files already on the PDS.
-
-* `throwaway.py`
-
-  asd
