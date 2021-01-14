@@ -12,7 +12,7 @@ Last Edited: 2021-01-13.
 
 *The master copy of the documents and scripts in this folder is at
 <https://github.com/AKROGIS/USGS-Topo-Processing>.  The Github repository
-does not contain the PDF and GeoTIFF files nor the file geodatabase.*
+does not contain the PDF and GeoTIFF files nor the file geodatabases.*
 
 **NOTE:** Most historic maps are in NAD27, while the current maps and the
 Indexes are in NAD83.
@@ -99,8 +99,8 @@ search results in the `Indexes` folder.
   details.  In addition, the polygon extents are "nominal", i.e. they do not
   include data that "bleeds into the marginalia" on some maps.
 * `MAPINDICES_Alaska_State_GDB.xml` - FGDC Metadata for the database.
-* NPS_Processing_Data.gdb - Created to hold the NAD27 version of the Footprints.  
-  See the section on _Historic Footprints_ below.
+* `NPS_Processing_Data.gdb` - Created to hold the NAD27 version of the
+  Footprints.  See the section on _Historic Footprints_ below.
 * `{itm|qq|qm}_data.csv` - files with filename attributes separated into columns
   as well as manually collected data (print date, etc) to help categorize and
   select the best available among multiple versions of a map.
