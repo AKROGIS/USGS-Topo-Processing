@@ -1,48 +1,89 @@
 # USGS Processing Tools
 
-This folder contains scripts (python and SQL) used to collect, organize,
-categorize, process, and maintain the data in this folder, and derived
+This folder contains Python scripts used to collect, organize, categorize,
+process, and maintain the data in the sibling folders, and derived
 products like statewide mosaics.  For appropriate use of these scripts
-see the Processing Notes below.
-
-**TODO** Organize by the scripts for the initial process, and for the new
-update process.
+see the [Update Instructions](Update_Instructions.md).
 
 * `add_pyramids.bat`
-  * A DOS batch file to run [GDAL](https://gdal.org) commands to add pyramids to
-    all GeoTIFFs in a folder tree. This should only be run on a folder with new
-    files. It does not clear any existing pyramids, and does not check for
-    existing pyramids.
+
+  A DOS batch file to run [GDAL](https://gdal.org) commands to add pyramids to
+  all GeoTIFFs in a folder tree. This should only be run on a folder with new
+  files. It does not clear any existing pyramids, and does not check for
+  existing pyramids.
+
+  **TO DO:** Needs cleanup.
+
 * `arrange_topos.py`
-  * Moves topos in a root folder into sub-folders (creating as needed)
-    based on the root name of the topo map.  This is useful for the
-    current GeoPDFs as well as the historical ITM maps.
-* `check_qmtopos.sql`
-  * A collection of SQL scripts that check the sanity of the manually
-    collected data in `qm_data.csv` (after that file is imported into
-    a SQL database).
-* `compare.py`
-  * Compares a National Map search results file (typically in the Indexes
-    folder with a folder of downloaded files.
+
+  Put topos in correct folder structure. This will move the files in the various
+  `Download` folders to the PDS folder structure in the working directory.
+
+  **TO DO:** Needs cleanup.
+
+* `build_mosaics.py`
+
+  Add new aster images to the mosaic data sets.
+
+  **TO DO:** Needs cleanup.
+
+* `compare_pds_to_metadata.py`
+
+  Checks the PDS (X Drive) paths in the metadata files.
+  The metadata files are created with `make_alaska_lists.py` and they
+  contain paths to the permanent resources on the PDS.  These paths should
+  be checked whenever the metadata files are created.  Errors could be
+  introduced if the PDS files are edited, if the USGS database changes, or if
+  the processing scripts change.
+
 * `create_gdal_batchfile.py`
-  * looks for GeoPDF files without a newer GeoTIFF file and creates a
-    batch file of GDAL commands to create the missing GeoTIFF files.
-* `list_topos.py`
-  * Reads the filenames in a folder of historical topos and creates a
-    CSV file with the various attributes in the filename separated into
-    individual columns.  Creates the basis of a data file for categorizing
-    the historical topos.  This data is joined with the mosaic footprints.
-* `make_uget_list.py`
-  * extracts the download URL from the national map search results to
-    create a file suitable for input to the
-    [uGET](https://sourceforge.net/projects/urlget/) program.
-* `merge_search_results.py`
-  * Adds new (partial) search results to an older complete lists of search
-    results to create an up to date complete list of search results that
-    will match the downloaded files.
+
+  looks for GeoPDF files without a newer GeoTIFF file and creates a
+  batch file of GDAL commands to create the missing GeoTIFF files.
+
+  **TO DO:** Needs cleanup.
+
+* `make_alaska_lists.py`
+
+  Reads a downloaded snapshot of the USGS database (as CSV) and creates the
+  lists of topographic maps for Alaska.
+
+* `make_folders.py`
+
+  Creates and/or clears the set of folders that are not part of the code repo
+  but are assumed by other steps in the processing scripts.  This script should
+  be run after cloning the repo to a new work folder, or when reprocessing
+  in a work folder used previously to process new topo maps.
+
+
+## Additional tools
+
+Tools that may yet be of value if they are cleaned up and documented in the
+process steps.
+
+* `compare_trees.py`
+
+  Compares the local directories to the PDS directories, and prints a
+  list of files that are new, deleted, and updated.
+
+* `fixme.py`
+
+  Another tool to compare the local file system against a list of files and
+  the PDS.
+
 * `pdf_diffs.py`
-  * Compares newly downloaded PDF files with existing downloaded PDF files.
-    The national map search results may indicate that a map has been
-    updated, however this may mean that only the metadata was updated
-    while the PDF content is unchanged.  This will identify "updated"
-    topos that actually have no change to the PDF file.
+
+  Compares contents of a newly downloaded PDF files with existing PDF files by
+  using a file hash. The USGS database may indicate that a map has been
+  updated, however this may mean that only the metadata was updated
+  while the PDF content is unchanged.  This will identify "updated"
+  topos that actually have no change to the PDF file.
+
+* `remove_dups.py`
+
+  Uses the status file from `pdf_diffs.py` and deletes local files
+  that are duplicate of files already on the PDS.
+
+* `throwaway.py`
+
+  asd
