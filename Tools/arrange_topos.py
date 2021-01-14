@@ -36,7 +36,7 @@ CONFIG = {
     # raster files generated from the list of GeoPDFs (in column)
     'moves': [
         {
-            'dowload_folder': 'ITM',
+            'download_folder': 'ITM',
             'pds_folder': 'Historic_ITM',
             'subfolder_name': {
                 'column': 'Map Folder',
@@ -44,17 +44,17 @@ CONFIG = {
             }
         },
         {
-            'dowload_folder': 'QM',
+            'download_folder': 'QM',
             'pds_folder': 'Historic_QM',
             'subfolder_name': None
         },
         {
-            'dowload_folder': 'QQ',
+            'download_folder': 'QQ',
             'pds_folder': 'Historic_QQ',
             'subfolder_name': None
         },
         {
-            'dowload_folder': 'TOPO',
+            'download_folder': 'TOPO',
             'pds_folder': 'Current_GeoPDF',
             'subfolder_name': {
                 'column': 'Map Folder',

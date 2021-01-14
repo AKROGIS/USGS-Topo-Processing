@@ -16,7 +16,7 @@ This script prints to the standard output (usually the terminal window):
  name, while some have a lower case c.  However Windows is case sensitive, 
  so there is only one folder (with an upper case c).  Python string compares
  are case sensitive, so there are unexpected mismatches without the special case.
- Same is true of the Lime Hills (Current GeoPDF); LIme Hilss <\!= Lime Hills
+ Same is true of the Lime Hills (Current GeoPDF); LIme Hills != Lime Hills
 '''
 
 from __future__ import absolute_import, division, print_function, unicode_literals
