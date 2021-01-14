@@ -1,7 +1,5 @@
 # Indexes
 
-**NOTE** This section needs to be updated.
-
 * `MAPINDICES_Alaska_State_GDB.gdb` - A file geodatabase downloaded from the
   National Map, that has the polygon extents (footprint) for data portion of
   each map (i.e. it excludes the marginalia). See the metadata for the date
@@ -17,5 +15,3 @@
 * `{itm|qq|qm}_data.csv` - files with filename attributes separated into columns
   as well as manually collected data (print date, etc) to help categorize and
   select the best available among multiple versions of a map.
-* `nationalmap_search_results*.csv` - search results from the national map
-  that provide the source URL and additional metadata for each downloaded file.

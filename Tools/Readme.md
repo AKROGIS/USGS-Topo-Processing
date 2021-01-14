@@ -19,7 +19,7 @@ see the [Update Instructions](Update_Instructions.md).
   Put topos in correct folder structure. This will move the files in the various
   `Download` folders to the PDS folder structure in the working directory.
 
-  **TO DO:** Needs cleanup.
+  **TO DO:** Needs finishing and cleanup. Rename to `organize_downloads.py`
 
 * `build_mosaics.py`
 
@@ -54,7 +54,6 @@ see the [Update Instructions](Update_Instructions.md).
   but are assumed by other steps in the processing scripts.  This script should
   be run after cloning the repo to a new work folder, or when reprocessing
   in a work folder used previously to process new topo maps.
-
 
 ## Additional tools
 
