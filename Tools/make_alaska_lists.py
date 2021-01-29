@@ -377,13 +377,9 @@ def make_lists():
             )
         )
 
-    with open_csv(
-        allfile, "r"
-    ) as all_h, open(
+    with open_csv(allfile, "r") as all_h, open(
         topo_urls, "w", encoding="utf-8"
-    ) as topo_urls_h, open_csv(
-        topo_metadata, "w"
-    ) as topo_meta_h, open(
+    ) as topo_urls_h, open_csv(topo_metadata, "w") as topo_meta_h, open(
         qq_urls, "w", encoding="utf-8"
     ) as qq_urls_h, open_csv(
         qq_metadata, "w"
