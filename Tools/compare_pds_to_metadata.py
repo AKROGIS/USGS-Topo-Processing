@@ -24,6 +24,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 import csv
 import os
+import sys
 
 CONFIG = {
     # The working folder where input/output files can be found
@@ -88,6 +89,7 @@ def check_metadata_paths():
 
 def open_csv_read(filename):
     """Open a file for CSV reading in a Python 2 and 3 compatible way."""
+
     if sys.version_info[0] < 3:
         return open(filename, "rb")
     return open(filename, "r", encoding="utf8", newline="")
@@ -154,14 +156,14 @@ def get_pds_files(folders):
 
     paths = set()
     for folder in folders:
-        for cdir, _, files in os.walk(folder):
+        for directory, _, files in os.walk(folder):
             for filename in files:
                 # skip world files; required to correct georeferencing
                 if filename.endswith(".tfwx"):
                     continue
                 if filename.endswith(".tif.aux.xml"):
                     continue
-                path = os.path.join(cdir, filename)
+                path = os.path.join(directory, filename)
                 paths.add(path)
 
     return paths

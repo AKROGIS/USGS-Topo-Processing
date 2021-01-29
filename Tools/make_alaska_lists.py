@@ -14,6 +14,7 @@ import datetime
 from io import open
 import os
 import re
+import sys
 
 CONFIG = {
     # The working folder where input/output files can be found
@@ -124,6 +125,7 @@ def write_csv_row(writer, row):
 
 
 def py23_fix_row(row):
+    """Return a list of unicode strings from Python 2 or Python 3 strings."""
     if sys.version_info[0] < 3:
         return [item.decode("utf-8") for item in row]
     return row
@@ -442,8 +444,6 @@ def make_lists():
         write_csv_row(csv_writer_qq_meta, new_header)
         write_csv_row(csv_writer_qm_meta, new_header)
         write_csv_row(csv_writer_itm_meta, new_header)
-
-        write_csv_row(csv_writer_topo_meta, row)
 
         for row in csv_reader:
             row = py23_fix_row(row)

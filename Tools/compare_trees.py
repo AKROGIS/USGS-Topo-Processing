@@ -19,8 +19,8 @@ CONFIG = {
     "print_adds": False,
     # extras are relative file paths in old_root, but not new_root
     "print_extras": False,
-    # dups are relative file paths in both new_root and old_root
-    "print_dups": True,
+    # duplicates are relative file paths in both new_root and old_root
+    "print_duplicates": True,
 }
 
 
@@ -35,13 +35,15 @@ def walk_tree(root):
 
 
 def main():
+    """Compare two similar folders and prints a report of differences."""
+
     old_root = CONFIG["old_root"]
     new_root = CONFIG["new_root"]
     old_paths = walk_tree(old_root)
     new_paths = walk_tree(new_root)
     adds = new_paths - old_paths
     extras = old_paths - new_paths
-    dups = old_paths & new_paths
+    duplicates = old_paths & new_paths
 
     if CONFIG["print_summary"]:
         print("Summary")
@@ -50,7 +52,7 @@ def main():
         print("Replacement Files: {0} at {1}".format(len(new_paths), new_root))
         print("New Files: {0}".format(len(adds)))
         print("Extra Files: {0}".format(len(extras)))
-        print("Duplicate Files: {0}".format(len(dups)))
+        print("Duplicate Files: {0}".format(len(duplicates)))
 
     if CONFIG["print_extras"]:
         print("")
@@ -66,11 +68,11 @@ def main():
         for name in sorted(list(adds)):
             print(name)
 
-    if CONFIG["print_dups"]:
+    if CONFIG["print_duplicates"]:
         print("")
         print("Duplicate Files")
         print("===============")
-        for name in sorted(list(dups)):
+        for name in sorted(list(duplicates)):
             print(name)
 
 

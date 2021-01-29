@@ -65,6 +65,7 @@ folders_to_fix = [("Historic_ITM", ".itf"), ("Current_GeoPDF", ".pdf")]
 
 
 def get_folder_names(files, kind):
+    """Return the name of the folder a topo map should be in."""
     if kind == ".tif":
         regex = re.compile(r"AK_([A-Za-z ]+)( [A-D]-[0-8]|_).*")
     else:
@@ -87,19 +88,22 @@ def get_folder_names(files, kind):
 
 
 def main():
+    """Move topo maps into the appropriate sub folder."""
     for topo_folder, topo_ext in folders_to_fix:
         if not os.path.isdir(topo_folder):
             print('Could not find the folder: "{0}", Skipping'.format(topo_folder))
         else:
             print('Organizing files in "{0}"'.format(topo_folder))
-        new_files = [f for f in os.listdir(topo_folder) if f.lower().endswith(topo_ext)]
+        new_files = [
+            topo for topo in os.listdir(topo_folder) if topo.lower().endswith(topo_ext)
+        ]
         if new_files:
             print("  Found {0} new files.".format(len(new_files)))
             folders = get_folder_names(new_files, topo_ext)
-            for f in sorted(folders):
-                # print("  Processing folder {0}".format(f))
-                files = folders[f]
-                folder = os.path.join(topo_folder, f)
+            for topo in sorted(folders):
+                # print("  Processing folder {0}".format(topo))
+                files = folders[topo]
+                folder = os.path.join(topo_folder, topo)
                 try:
                     os.mkdir(folder)
                 except OSError as ex:
