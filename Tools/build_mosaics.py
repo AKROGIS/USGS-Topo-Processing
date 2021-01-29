@@ -4,6 +4,7 @@ import time
 import os
 import csv
 import logging
+import sys
 
 logger = logging.getLogger(__name__)
 logger.addHandler(logging.NullHandler())
@@ -20,14 +21,23 @@ def check_arcgis_ver():
     logger.info("Running ArcGIS version %s" % (arcpy.GetInstallInfo()["Version"]))
 
 
+def open_csv_read(filename):
+    """Open a file for CSV reading in a Python 2 and 3 compatible way."""
+    if sys.version_info[0] < 3:
+        return open(filename, "rb")
+    return open(filename, "r", encoding="utf8", newline="")
+
+
 def load_csv_file(csvpath):
     records = []
-    with open(csvpath, "rb") as fh:
+    with open_csv_read(csvpath) as csv_file:
+        csv_reader = csv.reader(csv_file)
         # ignore the first record (header)
-        fh.readline()
-        for row in csv.reader(fh):
-            unicode_row = [unicode(item, "utf-8") if item else None for item in row]
-            records.append(unicode_row)
+        next(csv_reader)
+        for row in csv_reader:
+            if sys.version_info[0] < 3:
+                row = [item.decode("utf-8") for item in row]
+            records.append(row)
     return records
 
 

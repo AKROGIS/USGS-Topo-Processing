@@ -85,6 +85,13 @@ def check_metadata_paths():
         print("Woot, Woot!, No Extra Files")
 
 
+def open_csv_read(filename):
+    """Open a file for CSV reading in a Python 2 and 3 compatible way."""
+    if sys.version_info[0] < 3:
+        return open(filename, "rb")
+    return open(filename, "r", encoding="utf8", newline="")
+
+
 def get_paths_and_folders():
     """Scans the metadata files to get a set of paths and folders."""
 
@@ -96,9 +103,9 @@ def get_paths_and_folders():
         file_name = metadata["file"]
         file_path = os.path.join(metadata_folder, file_name)
         path_column = metadata["column"]
-        with open(file_path) as in_file:
-            csvreader = csv.reader(in_file)
-            header = next(csvreader)
+        with open_csv_read(file_path) as in_file:
+            csv_reader = csv.reader(in_file)
+            header = next(csv_reader)
             message = "WARNING: Column '{0}' not found in {1}. Skipping."
             try:
                 path_index = header.index(path_column)
@@ -115,7 +122,9 @@ def get_paths_and_folders():
                 except ValueError:
                     print(message.format(raster["column"], file_name))
                     raster = None
-            for row in csvreader:
+            for row in csv_reader:
+                if sys.version_info[0] < 3:
+                    row = [item.decode("utf-8") for item in row]
                 path = row[path_index]
                 folder = os.path.dirname(path)
                 # Special case for Bradfield Canal; Some paths are upper case C some are not

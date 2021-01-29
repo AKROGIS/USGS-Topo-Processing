@@ -1,4 +1,6 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
+
+from io import open
 import os
 import re
 import sys
@@ -29,7 +31,7 @@ def tifname_from_pdfname(name):
 
 
 def main():
-    with open(output_script, "w") as fh:
+    with open(output_script, "w", encoding="utf-8") as fh:
         if not os.path.isdir(pdf_root_folder):
             print('Could not find the folder: "{0}", Aborting'.format(pdf_root_folder))
             sys.exit(1)

@@ -3,13 +3,14 @@ Reads a USGS database snapshot and creates lists of Alaska Topo Maps
 
 Edit the CONFIG object to set execution options and change assumptions
 
-Requires Python 3.0+
+Works with Python 2.7 and 3.6+
 """
 
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 import csv
 import datetime
+from io import open
 import os
 import re
 
@@ -95,6 +96,38 @@ CONFIG = {
 }
 
 
+def open_csv(filename, mode="r"):
+    """
+    Open a file for CSV mode in a Python 2 and 3 compatible way.
+
+    mode must be one of "r" for reading or "w" for writing.
+    """
+    if sys.version_info[0] < 3:
+        return open(filename, mode + "b")
+    return open(filename, mode, encoding="utf8", newline="")
+
+
+def write_csv_row(writer, row):
+    """writer is a csv.writer, and row is a list of unicode or number objects."""
+    if sys.version_info[0] < 3:
+        # Ignore the pylint error that unicode is undefined in Python 3
+        # pylint: disable=undefined-variable
+        writer.writerow(
+            [
+                item.encode("utf-8") if isinstance(item, unicode) else item
+                for item in row
+            ]
+        )
+    else:
+        writer.writerow(row)
+
+
+def py23_fix_row(row):
+    if sys.version_info[0] < 3:
+        return [item.decode("utf-8") for item in row]
+    return row
+
+
 def skip(row, row_filter):
     """
     Return true if this row should be ignored.
@@ -121,9 +154,10 @@ def print_domains():
     domains = [
         {"name": name, "index": -1, "values": set()} for name in set(column_names)
     ]
-    with open(allfile) as in_file:
+    with open_csv(allfile, "r") as in_file:
         csvreader = csv.reader(in_file)
         header = next(csvreader)
+        header = py23_fix_row(header)
         for domain in domains:
             try:
                 domain["index"] = header.index(domain["name"])
@@ -137,6 +171,7 @@ def print_domains():
                 except ValueError:
                     pass
         for row in csvreader:
+            row = py23_fix_row(row)
             if not skip(row, row_filter):
                 for domain in domains:
                     if domain["index"] >= 0:
@@ -162,9 +197,10 @@ def check_urls():
     allfile = os.path.join(CONFIG["work_folder"], CONFIG["usgs_file"])
     check_filter = CONFIG["check_filter"]
     row_filter = {}
-    with open(allfile) as in_file:
+    with open_csv(allfile, "r") as in_file:
         csvreader = csv.reader(in_file)
         header = next(csvreader)
+        header = py23_fix_row(header)
         try:
             url_index = header.index(CONFIG["url_column_name"])
         except ValueError:
@@ -183,6 +219,7 @@ def check_urls():
                 except ValueError:
                     pass
         for row in csvreader:
+            row = py23_fix_row(row)
             if not skip(row, row_filter):
                 url = row[url_index]
                 map_name = row[map_name_index]
@@ -327,10 +364,8 @@ def make_lists():
     # get date of last processing
     datestamp_file = os.path.join(list_folder, CONFIG["datestamp"])
     try:
-        with open(datestamp_file, "r") as datestamp_h:
+        with open(datestamp_file, "r", encoding="utf-8") as datestamp_h:
             line = datestamp_h.readline()
-            # requires python 3.7+
-            # date = datetime.date.fromisoformat(line)
             year, month, day = line.split("-")
             date = datetime.date(int(year), int(month), int(day))
             CONFIG["since_date"] = date
@@ -341,23 +376,24 @@ def make_lists():
             )
         )
 
-    # When writing a CSV file how it is opened is different on OS/versions
-    # open(file_name, 'w') works on 2 and 3 on a Mac
-    # python on windows will add an extra newline after every data line, to avoid this:
-    # open(file_name, 'wb') is required on Windows w/ Python 2.x
-    # open(filename, 'w', newline='') is required on Windows w/ Python 3.x
-    with open(allfile) as all_h, open(topo_urls, "w") as topo_urls_h, open(
-        topo_metadata, "w", newline=""
-    ) as topo_meta_h, open(qq_urls, "w") as qq_urls_h, open(
-        qq_metadata, "w", newline=""
+    with open_csv(
+        allfile, "r"
+    ) as all_h, open(
+        topo_urls, "w", encoding="utf-8"
+    ) as topo_urls_h, open_csv(
+        topo_metadata, "w"
+    ) as topo_meta_h, open(
+        qq_urls, "w", encoding="utf-8"
+    ) as qq_urls_h, open_csv(
+        qq_metadata, "w"
     ) as qq_meta_h, open(
-        qm_urls, "w"
-    ) as qm_urls_h, open(
-        qm_metadata, "w", newline=""
+        qm_urls, "w", encoding="utf-8"
+    ) as qm_urls_h, open_csv(
+        qm_metadata, "w"
     ) as qm_meta_h, open(
-        itm_urls, "w"
-    ) as itm_urls_h, open(
-        itm_metadata, "w", newline=""
+        itm_urls, "w", encoding="utf-8"
+    ) as itm_urls_h, open_csv(
+        itm_metadata, "w"
     ) as itm_meta_h:
         csv_reader = csv.reader(all_h)
         csv_writer_topo_meta = csv.writer(topo_meta_h)
@@ -365,6 +401,7 @@ def make_lists():
         csv_writer_qm_meta = csv.writer(qm_meta_h)
         csv_writer_itm_meta = csv.writer(itm_meta_h)
         header = next(csv_reader)
+        header = py23_fix_row(header)
 
         # Get Indexes
         if topo_filter:
@@ -403,17 +440,22 @@ def make_lists():
             print("ERROR: URL column not found. Script will not perform as expected!")
 
         new_header = patch_header(header)
-        csv_writer_topo_meta.writerow(new_header)
-        csv_writer_qq_meta.writerow(new_header)
-        csv_writer_qm_meta.writerow(new_header)
-        csv_writer_itm_meta.writerow(new_header)
+
+        write_csv_row(csv_writer_topo_meta, new_header)
+        write_csv_row(csv_writer_qq_meta, new_header)
+        write_csv_row(csv_writer_qm_meta, new_header)
+        write_csv_row(csv_writer_itm_meta, new_header)
+
+        write_csv_row(csv_writer_topo_meta, row)
 
         for row in csv_reader:
+            row = py23_fix_row(row)
             url = None
             if not skip(row, topo_filter_indexes):
                 if url_index >= 0:
                     url = row[url_index]
-                csv_writer_topo_meta.writerow(patch_row(row, url, "topo"))
+                row = patch_row(row, url, "topo")
+                write_csv_row(csv_writer_topo_meta, row)
                 if url is not None and is_new_row(row):
                     topo_urls_h.write(url + "\n")
             elif not skip(row, htmc_filter_indexes):
@@ -426,20 +468,23 @@ def make_lists():
                 if url_index >= 0:
                     url = htmc_pdf_to_tif(row[url_index])
                 if scale < CONFIG["max_qq_scale"]:
-                    csv_writer_qq_meta.writerow(patch_row(row, url, "qq"))
+                    row = patch_row(row, url, "qq")
+                    write_csv_row(csv_writer_qq_meta, row)
                     if url is not None and new_row:
                         qq_urls_h.write(url + "\n")
                 elif scale > CONFIG["min_qm_scale"]:
-                    csv_writer_qm_meta.writerow(patch_row(row, url, "qm"))
+                    row = patch_row(row, url, "qm")
+                    write_csv_row(csv_writer_qm_meta, row)
                     if url is not None and new_row:
                         qm_urls_h.write(url + "\n")
                 else:
-                    csv_writer_itm_meta.writerow(patch_row(row, url, "itm"))
+                    row = patch_row(row, url, "itm")
+                    write_csv_row(csv_writer_itm_meta, row)
                     if url is not None and new_row:
                         itm_urls_h.write(url + "\n")
 
     # write the processing datestamp
-    with open(datestamp_file, "w") as datestamp_h:
+    with open(datestamp_file, "w", encoding="utf-8") as datestamp_h:
         now = datetime.date.today().isoformat()
         datestamp_h.write(now)
 
