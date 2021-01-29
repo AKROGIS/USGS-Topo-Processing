@@ -1,3 +1,8 @@
+# -*- coding: utf-8 -*-
+"""
+Creates a file of GDAL commands to translate USGS Topo GeoPDFs to GeoTiffs
+"""
+
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 from io import open

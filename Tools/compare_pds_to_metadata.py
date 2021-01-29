@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 Checks the PDS (X Drive) paths in the metadata files
 

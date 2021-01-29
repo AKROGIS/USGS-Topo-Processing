@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 This script moves new topo maps into the appropriate sub folder.
 

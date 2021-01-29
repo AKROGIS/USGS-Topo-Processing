@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 Creates and/or clears a set of subfolders
 
@@ -8,6 +9,8 @@ steps in the topo map processing scripts.  This script should be run
 after cloning the repo to a new work folder, or when reprocessing
 in a work folder used previously to process topo maps.
 """
+
+from __future__ import absolute_import, division, print_function, unicode_literals
 
 import os
 import shutil

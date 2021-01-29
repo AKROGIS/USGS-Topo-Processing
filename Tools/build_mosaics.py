@@ -1,10 +1,17 @@
+# -*- coding: utf-8 -*-
+"""
+Extracts a list of raster image paths form a CSV file and adds to a mosaic dataset.
+"""
+
 from __future__ import absolute_import, division, print_function, unicode_literals
-import arcpy
-import time
-import os
+
 import csv
 import logging
+import os
 import sys
+import time
+
+import arcpy
 
 logger = logging.getLogger(__name__)
 logger.addHandler(logging.NullHandler())

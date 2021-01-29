@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 Reads a USGS database snapshot and creates lists of Alaska Topo Maps
 
