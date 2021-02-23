@@ -48,19 +48,18 @@ class Config(object):
         "Historical_QQ",
         "Scratch",
         "Downloads",
+        "Downloads/QQ",
+        "Downloads/QM",
+        "Downloads/ITM",
+        "Downloads/TOPO",
     ]
-
-    # The list of sub-folders to clear/create in the download folder
-    # the name of the download folder is given by an index into the folder_list
-    download_folder_index = 6
-    download_folders = ["QQ", "QM", "ITM", "TOPO"]
 
 
 def clear_existing_folders():
     """Removed existing sub folders listed in the Config object."""
 
     root = Config.work_folder
-    for folder in Config.folder_list:
+    for folder in reversed(Config.folder_list):
         path = os.path.join(root, folder)
         remove_tree(path)
 
@@ -70,13 +69,6 @@ def make__missing_folders():
 
     root = Config.work_folder
     for folder in Config.folder_list:
-        path = os.path.join(root, folder)
-        make_dir(path)
-
-    # Create sub folders in the downloads folder
-    downloads = Config.folder_list[Config.download_folder_index]
-    root = os.path.join(root, downloads)
-    for folder in Config.download_folders:
         path = os.path.join(root, folder)
         make_dir(path)
 
