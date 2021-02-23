@@ -67,7 +67,8 @@ database download, even if the map itself did not change.
 
    - Check and update the `CONFIG` object at the beginning of
      `WD\Tools\compare_pds_to_metadata.py`
-   - Run `WD\Tools\compare_pds_to_metadata.py` to move the files.
+   - Run `WD\Tools\compare_pds_to_metadata.py` to compare the PDS with the
+     metadata files.
    - There should be no **Extra Files (in PDS but not metadata)**
    - Everything in **Extra Paths (in metadata, but not PDS)** except
      the paths in `Current_GeoTIFF` should be in one of the
@@ -117,42 +118,116 @@ subsequent scripts.
    the PDS folder structure in `WD`
 
    - Check and update the `CONFIG` object at the beginning of
-     `WD\Tools\arrange_topos.py`
-   - Run `WD\Tools\arrange_topos.py` to move the files.
+     `WD\Tools\organize_downloads.py`
+   - Run `WD\Tools\organize_downloads.py` to move the files.
 
-2. Convert GeoPDFs to GeoTIFFs
+2. Find/Remove duplicate PDFs
+   Sometimes USGS updates just the GeoPDF metadata, which makes it look like the
+   map is new, when infact there is no change in the PDF contents.  First
+   run `compare_file.py` to see if the downloaded PDFs are the same or different
+   keep the different files and remove the duplicates.
 
-## Check
-
-- Compare processed files with list and PDS library
-- Get list of new (not updated) tif files (for updating mosaics)
-
-## Document
-
-- Update metadata
+3. Convert GeoPDFs to GeoTIFFs
+  - run `create_gdal_batchfile.py`
+  - run generated batch file (break into chunks)
+  - run `add_pyramids.bat`
 
 ## Publish
 
-### Update Libraries
+### Update Libraries (Copy to PDS)
 
-- Copy pdf files to PDS
-- Copy tiff files to PDS
+  Manually copy `WD` folders to PDS.  Current_GeoPDF should all be additive
+  If there is a warning that you will be replacing files, stop and figure out
+  why.  You may be replacing files in `Current_GeoTIF`, If so, there should be
+  multiple GeoPDFs for this tile.  It is unlikely that there will be future
+  changes to the `Historic` folders, so review any changes closely.
 
 ### Update Mosaics
 
-- Add new rasters to mosaics
+- Generate list of new geotif raster compare download list to existing tif in
+  the PDS.  Updated tiles do not require adding rasters (just metadata)
+  - Add new rasters (if any) to mosaics
 - Update footprints with any new or updated metadata
   - Compare git history to see if metadata has changed
+  - Update manuallY??
+  - what if there are new fields in downloaded CSV database?
+  - how do we update just the changed values?  Manual??
+  - we can match based on raster name
+  - Do we need any attributes for the Current topos?
+  - Historic topos are unlikely to change
+    - handle small discret changes manually
+    - large changes with kill and fill (bulk erase and update all attributes)
+
+ - We will track `Scale`, `Map Folder`, `Create Date`, `PDS Path` and
+   `Date on Map` from `all_metadate_topo.csv`
+   where `Version` == `Current` (not `Historical`) 
+   in `X:\Mosaics\Statewide\Charts\USGS_Topo_Maps.gdb\Current_1to25k`
+   Link on the `Raster Name` == `Name`
+
+ - Historical footprints are joined to the metadata with the following
+   geoprocessing command.  If there is a major update, a similar command can
+   be used to do a bulk update.  Minor changes (as seen in any changes to the
+   metadata files in the git diff) will need to be done manually.  None are
+   expected. Summary of command below: join mosaic with csv on `Name = Raster_Name`
+   add all fields except `ObjectID` and `Raster_Name`
+
+   ```Python
+   arcpy.JoinField_management(in_data="C:/tmp/pds/topos/USGS_Topo_Maps.gdb/Historic_1to250k_Bathymetry", in_field="Name", join_table="C:/tmp/pds/topos/meta.gdb/all_metadata_qm", join_field="Raster_Name", fields="Series;Version;Cell_ID;Map_Name;Primary_State;Scale;Date_On_Map;Imprint_Year;Woodland_Tint;Visual_Version_Number;Photo_Inspection_Year;Photo_Revision_Year;Aerial_Photo_Year;Edit_Year;Field_Check_Year;Survey_Year;Datum;Projection;Advance;Preliminary;Provisional;Interim;Planimetric;Special_Printing;Special_Map;Shaded_Relief;Orthophoto;Pub_USGS;Pub_Army_Corps_Eng;Pub_Army_Map;Pub_Forest_Serv;Pub_Military_Other;Pub_Reclamation;Pub_War_Dept;Pub_Bur_Land_Mgmt;Pub_Natl_Park_Serv;Pub_Indian_Affairs;Pub_EPA;Pub_Tenn_Valley_Auth;Pub_US_Commerce;Keywords;Map_Language;Scanner_Resolution;Cell_Name;Primary_State_Name;N_Lat;W_Long;S_Lat;E_Long;Link_to_HTMC_Metadata;Download_GeoPDF;View_FGDC_Metadata_XML;View_Thumbnail_Image;Scan_ID;GDA_Item_ID;Create_Date;Byte_Count;Grid_Size;Download_Product_S3;View_Thumbnail_Image_S3;NRN;NSN;Map_Folder;AWS_URL;PDS_Path")
+   ```
 
 ### Update repo/PDS documentation
 
-## TO DO
+## Verify
 
-- `make_alaska_lists.py`/`compare_pds_to_metadata.py`
-  - Compare PDS Path Column to PDS folders
-  - Verify code to create "Raster Name" and "PDS Path" matches existing files
-    on X drive.
-- Fix `organize_downloads.py` (was `arrange_topos.py`)
-- Cleanup build and run GDAL scripts
-  - build from columns in metadata
-- Cleanup `compare_trees.py` script
+- Run `WD\Tools\compare_pds_to_metadata.py` again.  The output should be
+
+    ```
+    Woot, Woot!, No Extra Paths
+    Woot, Woot!, No Extra Files
+    ```
+
+- If not, check that all the files `WD\Current*` and `WD\Historic*` were copied
+  to the PDS.
+- If that is not the problem, then I'm sorry, but you are in unexpected
+  territory and you will need to troubleshoot the problem on your own. See the
+  suggestions above in Step 6 of the *Discover* section.
+
+- New script to check footprints in mosaics with the list of files in the PDS
+  1) missing footprints for existing rasters
+  2) broken links: missing rasters for existing footprints.
+
+## Document
+
+- Commit changes to repo
+  - new download date
+  - updated metadata files and download lists
+- Update publish date in mosaic metadata
+
+
+# TO DO
+
+- Add CSV metadata attributes mosaic footprints
+- Create properly filtered ITM mosaic
+- Create metadata (Item description) for mosaics
+- Create Layer files
+- Publish layer files in TM
+- Cleanup Python code to match current conventions
+  - import csv23.py
+  - use Config class and not CONFIG dict.
+- Finish this document
+- Rename `arrange_topos.py` to `organize_downloads.py`
+  - Fix code.  It should move files from `WD\Download` folders to
+    a `WD` folder that matches the PDS (See discussion above)
+  - Finish code and test
+- Cleanup `create_gdal_batchfile.py` script
+  - build from columns in metadata and files in `WD\CurrentGeoPDF` folder
+- Fix/Test mosaic scripts
+  1) add new rasters to mosaic (`build_mosaics.py` -> `add_rasters_to_mosaics.py`)
+  2) update raster mosaic footprint attributes from metadata files.
+- New script to check mosaic footprints with PDS raster files  (see discussion above)
+- Move `compare_trees.py` to misc scripts
+- Rename `pdf_diff.py` to `compare_files.py` and document above (process step 2)
+- rename andthis folder and reclone the repo
+- Test all the scripts with Python 2 and 3 (Repo should not change)
+- Run the process from start to finish with latest database download
+
