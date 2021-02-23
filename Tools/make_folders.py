@@ -2,7 +2,7 @@
 """
 Creates and/or clears a set of subfolders
 
-Requires Python 3.3+
+Works with Python 2.7+ and Python 3.3+
 
 These folders are not part of the code repo but are assumed by other
 steps in the topo map processing scripts.  This script should be run
@@ -14,6 +14,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 import os
 import shutil
+import sys
 
 CONFIG = {
     # The working folder where input/output files can be found
@@ -51,10 +52,7 @@ def clear_existing_folders():
     root = CONFIG["work_folder"]
     for folder in CONFIG["folder_list"]:
         path = os.path.join(root, folder)
-        try:
-            shutil.rmtree(path)
-        except FileNotFoundError:
-            pass
+        remove_tree(path)
 
 
 def make__missing_folders():
@@ -63,16 +61,48 @@ def make__missing_folders():
     root = CONFIG["work_folder"]
     for folder in CONFIG["folder_list"]:
         path = os.path.join(root, folder)
-        try:
-            os.mkdir(path)
-        except FileExistsError:
-            pass
+        make_dir(path)
 
     # Create sub folders in the downloads folder
     downloads = CONFIG["folder_list"][CONFIG["download_folder_index"]]
     root = os.path.join(root, downloads)
     for folder in CONFIG["download_folders"]:
         path = os.path.join(root, folder)
+        make_dir(path)
+
+
+def remove_tree(path):
+    """Recursively remove an existing path. Silently ignores path not found.
+    
+    Python 2/3 compatible.
+    May throw OSError, IOError, shutil.Error
+    """
+    if sys.version_info[0] < 3:
+        try:
+            shutil.rmtree(path)
+        except OSError as e:
+            if e.errno != errno.ENOENT:
+                raise
+    else:
+        try:
+            shutil.rmtree(path)
+        except FileNotFoundError:
+            pass
+
+
+def make_dir(path):
+    """Make a directory if it does not exist. Silently ignores existing path.
+    
+    Python 2/3 compatible.
+    May throw OSError, IOError.
+    """
+    if sys.version_info[0] < 3:
+        try:
+            os.mkdir(path)
+        except OSError as e:
+            if e.errno != errno.EEXIST:
+                raise
+    else:
         try:
             os.mkdir(path)
         except FileExistsError:
