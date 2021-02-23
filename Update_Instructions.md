@@ -174,6 +174,28 @@ subsequent scripts.
    ```Python
    arcpy.JoinField_management(in_data="C:/tmp/pds/topos/USGS_Topo_Maps.gdb/Historic_1to250k_Bathymetry", in_field="Name", join_table="C:/tmp/pds/topos/meta.gdb/all_metadata_qm", join_field="Raster_Name", fields="Series;Version;Cell_ID;Map_Name;Primary_State;Scale;Date_On_Map;Imprint_Year;Woodland_Tint;Visual_Version_Number;Photo_Inspection_Year;Photo_Revision_Year;Aerial_Photo_Year;Edit_Year;Field_Check_Year;Survey_Year;Datum;Projection;Advance;Preliminary;Provisional;Interim;Planimetric;Special_Printing;Special_Map;Shaded_Relief;Orthophoto;Pub_USGS;Pub_Army_Corps_Eng;Pub_Army_Map;Pub_Forest_Serv;Pub_Military_Other;Pub_Reclamation;Pub_War_Dept;Pub_Bur_Land_Mgmt;Pub_Natl_Park_Serv;Pub_Indian_Affairs;Pub_EPA;Pub_Tenn_Valley_Auth;Pub_US_Commerce;Keywords;Map_Language;Scanner_Resolution;Cell_Name;Primary_State_Name;N_Lat;W_Long;S_Lat;E_Long;Link_to_HTMC_Metadata;Download_GeoPDF;View_FGDC_Metadata_XML;View_Thumbnail_Image;Scan_ID;GDA_Item_ID;Create_Date;Byte_Count;Grid_Size;Download_Product_S3;View_Thumbnail_Image_S3;NRN;NSN;Map_Folder;AWS_URL;PDS_Path")
    ```
+To recreate the footprints.
+* Create a new mosaic - See original processing for details
+  - Add Rasters
+  - Fix footprints
+  - Add columns from manual inspections (`Indexes\*_data.csv`)
+* Add columns from USGS (`Indexes\all_metadata_*.csv`)
+  - Add CSV file to a geodatabase
+  - Use Join Fields GP tool
+  - Join on `Mosaic.Name` = `CSV.Raster_Name`
+  - Exclude at least fields `OBJECTID` and `Raster_Name` (more for current topo)
+
+To update all the manual or USGS Columns
+* Use Delete Fields GP tool to remove all columns to the right
+  - Starting with `Series` and `Version` for USGS data
+  - Starting with columns after `UriHash` for manual data
+* Use `Join Fields` GP Tool as above to add attributes as above.
+
+To add data to just the new topo rasters, create a limited CSV from
+`Indexes\all_metadata_*.csv` that has only the records for the new rasters
+try filtering by `Create Date` or matching on the download list.  Then follow
+the instructions above for `Join Fields`, but only select the fields that are
+already in the footprints
 
 ### Update repo/PDS documentation
 
