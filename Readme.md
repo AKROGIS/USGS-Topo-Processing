@@ -1,21 +1,20 @@
 # USGS Topographic Maps
 
-This folder contains Topographic Maps from USGS and related files.
+This folder contains topographic maps from USGS and related files.
 These data are primarily snapshots of files available from the
 [National Map](https://viewer.nationalmap.gov). See
-[Initial_Process_Instruction](./Initial_Process_Instructions.md) for details
-on how these files were initially collected and processed. See
-[Update_Instructions](Update_Instructions.md) for how they are maintained.
-
-Created by: Regan Sarwas, Alaska NPS GIS Team.
-Last Edited: 2021-01-13.
+[Initial Process Instructions](Initial_Process_Instructions.md) for details
+on how these files were initially collected and processed and any issues
+discovered. See [Update Instructions](Update_Instructions.md) for how they are
+maintained.
 
 *The master copy of the documents and scripts in this folder is at
 <https://github.com/AKROGIS/USGS-Topo-Processing>.  The Github repository
 does not contain the PDF and GeoTIFF files nor the file geodatabases.*
 
 **NOTE:** Most historic maps are in NAD27, while the current maps and the
-Indexes are in NAD83.
+Indexes (footprints) are in NAD83.  The Alaska transform is used to re-project
+on the fly the source tiles (NAD27) to the footprint (NAD83).
 
 ## Current_GeoPDF
 
@@ -54,7 +53,8 @@ date, but some only differ based on the color gamut of the printed product.
 The file name only includes the original publication date, so additional data
 needed to differentiate and categorize maps with the same extents is maintained
 in the file called `itm_data.csv` in the `Indexes` folder. Additional metadata
-for each file is in the national map search results in the `Indexes` folder.
+for each file provided by USGS is in `all_metadata_itm.csv` in the `Indexes`
+folder.
 
 ## Historical_QM
 
@@ -68,8 +68,8 @@ by revision and/or printing date, but some only differ based on the color gamut
 of the printed product. The file name only includes the original publication
 date, so additional data needed to differentiate and categorize maps with the
 same extents is maintained in the file called `qm_data.csv` in the `Indexes`
-folder. Additional metadata for each file is in the national map search results
-in the `Indexes` folder.
+folder. Additional metadata for each file provided by USGS is in
+`all_metadata_qm.csv` in the `Indexes` folder.
 
 ## Historical_QQ
 
@@ -82,17 +82,17 @@ also vary by revision and/or printing date, but some only differ based on the
 color gamut of the printed product. The file name only includes the original
 publication date, so additional data needed to differentiate and categorize
 maps with the same extents is maintained in the file called `qq_data.csv` in
-the `Indexes` folder. Additional metadata for each file is in the national map
-search results in the `Indexes` folder.
+the `Indexes` folder. Additional metadata for each file provided by USGS is in
+`all_metadata_qq.csv` in the `Indexes` folder.
 
 ## Indexes
 
 A folder with a file geodatabase with footprints for each map, and lists of maps
-with metadata (some from USGS, and some from me). See the Readme in this folder
-for additional details.
+with metadata (some from USGS, and some from me). See the
+[Readme](Indexes/Readme.md) in the Indexes folder for additional details.
 
 ## Tools
 
 Scripts for updating the contents of the above folders and other derived
-products with updated data from the USGS.  See the Readme in this folder for
-additional details.
+products with updated data from the USGS.  See the [Readme](Tools/Readme.md) in
+the Tools folder for additional details.
