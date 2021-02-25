@@ -24,8 +24,8 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 import csv
 import os
-import sys
 
+import csv23
 
 class Config(object):
     """Namespace for configuration parameters. Edit as needed."""
@@ -93,14 +93,6 @@ def check_metadata_paths():
         print("Woot, Woot!, No Extra Files")
 
 
-def open_csv_read(filename):
-    """Open a file for CSV reading in a Python 2 and 3 compatible way."""
-
-    if sys.version_info[0] < 3:
-        return open(filename, "rb")
-    return open(filename, "r", encoding="utf8", newline="")
-
-
 def get_paths_and_folders():
     """Scans the metadata files to get a set of paths and folders."""
 
@@ -112,7 +104,7 @@ def get_paths_and_folders():
         file_name = metadata["file"]
         file_path = os.path.join(metadata_folder, file_name)
         path_column = metadata["column"]
-        with open_csv_read(file_path) as in_file:
+        with csv23.open(file_path, "r") as in_file:
             csv_reader = csv.reader(in_file)
             header = next(csv_reader)
             message = "WARNING: Column '{0}' not found in {1}. Skipping."
@@ -132,8 +124,7 @@ def get_paths_and_folders():
                     print(message.format(raster["column"], file_name))
                     raster = None
             for row in csv_reader:
-                if sys.version_info[0] < 3:
-                    row = [item.decode("utf-8") for item in row]
+                row = csv23.fix(row)
                 path = row[path_index]
                 folder = os.path.dirname(path)
                 # Special case for Bradfield Canal; Some paths are upper case C some are not

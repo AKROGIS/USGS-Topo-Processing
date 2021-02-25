@@ -238,9 +238,6 @@ already in the footprints
 
 # TO DO
 
-- Cleanup Python code to match current conventions
-  - import csv23.py
-  - use Config class and not CONFIG dict.
 - Finish this document
 - In `organize_downloads.py`
   - Fix code.  It should move files from `WD\Download` folders to

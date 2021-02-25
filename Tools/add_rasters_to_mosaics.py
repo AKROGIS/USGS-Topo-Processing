@@ -7,30 +7,22 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 import csv
 import os
-import sys
 
 import arcpy
 
-
-def open_csv_read(filename):
-    """Open a file for CSV reading in a Python 2 and 3 compatible way."""
-
-    if sys.version_info[0] < 3:
-        return open(filename, "rb")
-    return open(filename, "r", encoding="utf8", newline="")
+import csv23
 
 
 def load_csv_file(csvpath):
     """Return a list of the rows in the CSV."""
 
     records = []
-    with open_csv_read(csvpath) as csv_file:
+    with csv23.open(csvpath, "r") as csv_file:
         csv_reader = csv.reader(csv_file)
         # ignore the first record (header)
         next(csv_reader)
         for row in csv_reader:
-            if sys.version_info[0] < 3:
-                row = [item.decode("utf-8") for item in row]
+            row = csv23.fix(row)
             records.append(row)
     return records
 

@@ -14,6 +14,11 @@ see the [Update Instructions](Update_Instructions.md).
 
   **TO DO:** Needs cleanup.
 
+* `csv23.py`
+
+  A module for safely reading and writing CSV files that may contain non-ASCII
+  characters in a way that is compatible with both Python 2 and Python 3.
+
 * `organize_downloads.py`
 
   Put topos in correct folder structure. This will move the files in the various

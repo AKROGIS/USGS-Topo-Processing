@@ -14,7 +14,8 @@ import datetime
 from io import open
 import os
 import re
-import sys
+
+import csv23
 
 
 class Config(object):
@@ -121,39 +122,6 @@ class Config(object):
     }
 
 
-def open_csv(filename, mode="r"):
-    """
-    Open a file for CSV mode in a Python 2 and 3 compatible way.
-
-    mode must be one of "r" for reading or "w" for writing.
-    """
-    if sys.version_info[0] < 3:
-        return open(filename, mode + "b")
-    return open(filename, mode, encoding="utf8", newline="")
-
-
-def write_csv_row(writer, row):
-    """writer is a csv.writer, and row is a list of unicode or number objects."""
-    if sys.version_info[0] < 3:
-        # Ignore the pylint error that unicode is undefined in Python 3
-        # pylint: disable=undefined-variable
-        writer.writerow(
-            [
-                item.encode("utf-8") if isinstance(item, unicode) else item
-                for item in row
-            ]
-        )
-    else:
-        writer.writerow(row)
-
-
-def py23_fix_row(row):
-    """Return a list of unicode strings from Python 2 or Python 3 strings."""
-    if sys.version_info[0] < 3:
-        return [item.decode("utf-8") for item in row]
-    return row
-
-
 def skip(row, row_filter):
     """
     Return true if this row should be ignored.
@@ -180,10 +148,10 @@ def print_domains():
     domains = [
         {"name": name, "index": -1, "values": set()} for name in set(column_names)
     ]
-    with open_csv(allfile, "r") as in_file:
+    with csv23.open(allfile, "r") as in_file:
         csvreader = csv.reader(in_file)
         header = next(csvreader)
-        header = py23_fix_row(header)
+        header = csv23.fix(header)
         for domain in domains:
             try:
                 domain["index"] = header.index(domain["name"])
@@ -197,7 +165,7 @@ def print_domains():
                 except ValueError:
                     pass
         for row in csvreader:
-            row = py23_fix_row(row)
+            row = csv23.fix(row)
             if not skip(row, row_filter):
                 for domain in domains:
                     if domain["index"] >= 0:
@@ -223,10 +191,10 @@ def check_urls():
     allfile = os.path.join(Config.work_folder, Config.usgs_file)
     check_filter = Config.check_filter
     row_filter = {}
-    with open_csv(allfile, "r") as in_file:
+    with csv23.open(allfile, "r") as in_file:
         csvreader = csv.reader(in_file)
         header = next(csvreader)
-        header = py23_fix_row(header)
+        header = csv23.fix(header)
         try:
             url_index = header.index(Config.url_column_name)
         except ValueError:
@@ -245,7 +213,7 @@ def check_urls():
                 except ValueError:
                     pass
         for row in csvreader:
-            row = py23_fix_row(row)
+            row = csv23.fix(row)
             if not skip(row, row_filter):
                 url = row[url_index]
                 map_name = row[map_name_index]
@@ -402,19 +370,19 @@ def make_lists():
             )
         )
 
-    with open_csv(allfile, "r") as all_h, open(
+    with csv23.open(allfile, "r") as all_h, open(
         topo_urls, "w", encoding="utf-8"
-    ) as topo_urls_h, open_csv(topo_metadata, "w") as topo_meta_h, open(
+    ) as topo_urls_h, csv23.open(topo_metadata, "w") as topo_meta_h, open(
         qq_urls, "w", encoding="utf-8"
-    ) as qq_urls_h, open_csv(
+    ) as qq_urls_h, csv23.open(
         qq_metadata, "w"
     ) as qq_meta_h, open(
         qm_urls, "w", encoding="utf-8"
-    ) as qm_urls_h, open_csv(
+    ) as qm_urls_h, csv23.open(
         qm_metadata, "w"
     ) as qm_meta_h, open(
         itm_urls, "w", encoding="utf-8"
-    ) as itm_urls_h, open_csv(
+    ) as itm_urls_h, csv23.open(
         itm_metadata, "w"
     ) as itm_meta_h:
         csv_reader = csv.reader(all_h)
@@ -423,7 +391,7 @@ def make_lists():
         csv_writer_qm_meta = csv.writer(qm_meta_h)
         csv_writer_itm_meta = csv.writer(itm_meta_h)
         header = next(csv_reader)
-        header = py23_fix_row(header)
+        header = csv23.fix(header)
 
         # Get Indexes
         if topo_filter:
@@ -463,19 +431,19 @@ def make_lists():
 
         new_header = patch_header(header)
 
-        write_csv_row(csv_writer_topo_meta, new_header)
-        write_csv_row(csv_writer_qq_meta, new_header)
-        write_csv_row(csv_writer_qm_meta, new_header)
-        write_csv_row(csv_writer_itm_meta, new_header)
+        csv23.write(csv_writer_topo_meta, new_header)
+        csv23.write(csv_writer_qq_meta, new_header)
+        csv23.write(csv_writer_qm_meta, new_header)
+        csv23.write(csv_writer_itm_meta, new_header)
 
         for row in csv_reader:
-            row = py23_fix_row(row)
+            row = csv23.fix(row)
             url = None
             if not skip(row, topo_filter_indexes):
                 if url_index >= 0:
                     url = row[url_index]
                 row = patch_row(row, url, "topo")
-                write_csv_row(csv_writer_topo_meta, row)
+                csv23.write(csv_writer_topo_meta, row)
                 if url is not None and is_new_row(row):
                     topo_urls_h.write(url + "\n")
             elif not skip(row, htmc_filter_indexes):
@@ -489,17 +457,17 @@ def make_lists():
                     url = htmc_pdf_to_tif(row[url_index])
                 if scale < Config.max_qq_scale:
                     row = patch_row(row, url, "qq")
-                    write_csv_row(csv_writer_qq_meta, row)
+                    csv23.write(csv_writer_qq_meta, row)
                     if url is not None and new_row:
                         qq_urls_h.write(url + "\n")
                 elif scale > Config.min_qm_scale:
                     row = patch_row(row, url, "qm")
-                    write_csv_row(csv_writer_qm_meta, row)
+                    csv23.write(csv_writer_qm_meta, row)
                     if url is not None and new_row:
                         qm_urls_h.write(url + "\n")
                 else:
                     row = patch_row(row, url, "itm")
-                    write_csv_row(csv_writer_itm_meta, row)
+                    csv23.write(csv_writer_itm_meta, row)
                     if url is not None and new_row:
                         itm_urls_h.write(url + "\n")
 
