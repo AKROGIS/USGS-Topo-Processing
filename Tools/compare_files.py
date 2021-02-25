@@ -7,6 +7,8 @@ by md5 hash results.
 
 Folder or file names to compare are provide as command line arguments.
 Results are printed to the standard out (console).
+
+Works with Python 2.7+ and Python 3.3+
 """
 
 from __future__ import absolute_import, division, print_function, unicode_literals
