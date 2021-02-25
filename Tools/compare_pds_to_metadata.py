@@ -27,6 +27,7 @@ import os
 
 import csv23
 
+
 class Config(object):
     """Namespace for configuration parameters. Edit as needed."""
 

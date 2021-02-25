@@ -17,6 +17,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 import os
 import re
 
+
 class Config(object):
     """Namespace for configuration parameters. Edit as needed."""
 
@@ -59,7 +60,6 @@ class Config(object):
             },
         },
     ]
-
 
 
 """

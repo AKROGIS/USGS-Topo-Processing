@@ -413,9 +413,7 @@ def make_lists():
         except (KeyError, ValueError):
             print("ERROR: Date column not found. Script will not perform as expected!")
         try:
-            Config.map_name_column_index = header.index(
-                Config.map_name_column_name
-            )
+            Config.map_name_column_index = header.index(Config.map_name_column_name)
         except (KeyError, ValueError):
             print(
                 "ERROR: Map name column not found. Script will not perform as expected!"

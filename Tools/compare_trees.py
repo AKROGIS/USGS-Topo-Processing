@@ -35,7 +35,6 @@ class Config(object):
     print_duplicates = True
 
 
-
 def walk_tree(root):
     """ returns a set of relative paths below root """
     paths = set()
