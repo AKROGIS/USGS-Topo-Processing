@@ -112,7 +112,13 @@ subsequent scripts.
 
 ## Process
 
-1. Put topos in correct folder structure
+2. Find/Remove duplicate PDFs
+   Sometimes USGS updates just the GeoPDF metadata, which makes it look like the
+   map is new, when in fact there is no change in the PDF contents.  First
+   run `compare_file.py` to see if the downloaded PDFs are the same or different
+   keep the different files and remove the duplicates.
+
+2. Put topos in correct folder structure
 
    This will move the files in the various `WD\Download` folders to
    the PDS folder structure in `WD`
@@ -120,12 +126,6 @@ subsequent scripts.
    - Check and update the `CONFIG` object at the beginning of
      `WD\Tools\organize_downloads.py`
    - Run `WD\Tools\organize_downloads.py` to move the files.
-
-2. Find/Remove duplicate PDFs
-   Sometimes USGS updates just the GeoPDF metadata, which makes it look like the
-   map is new, when in fact there is no change in the PDF contents.  First
-   run `compare_file.py` to see if the downloaded PDFs are the same or different
-   keep the different files and remove the duplicates.
 
 3. Convert GeoPDFs to GeoTIFFs
    - run `create_gdal_batchfile.py`

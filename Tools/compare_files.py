@@ -5,8 +5,8 @@ Print the results of comparing two folders or files.
 Folders are compared by comparing all the files within.  Files are compared
 by md5 hash results.
 
-Folder or file names to compare are provide as command line arguments.
-Results are printed to the standard out (console).
+Folder or file names to compare are provide as Config options, or as command
+line arguments, See Config. Results are printed to the standard out (console).
 
 Works with Python 2.7+ and Python 3.3+
 """
@@ -17,6 +17,24 @@ import hashlib
 from io import open
 import os
 import sys
+
+
+class Config(object):
+    """Namespace for configuration parameters. Edit as needed."""
+
+    # pylint: disable=useless-object-inheritance,too-few-public-methods
+
+    # If False, the script will get the two objects to compare from the command line.
+    use_config = True
+
+    # The working folder where input/output files can be found
+    work_folder = "B:\\Work\\USGS-Topo-Processing"
+
+    # The location of the downloaded GeoPDFs, 
+    download_pdfs = os.path.join(work_folder, "Downloads\\TOPO")
+
+    # The Alaska Region PDS (X drive) folder where the existing GeoPDFs
+    pds_pdfs = "X:\\Extras\\AKR\\Statewide\\Charts\\USGS_Topo\\Current_GeoPDF"
 
 
 def md5(filename):
@@ -51,8 +69,12 @@ def file_map(folder):
 def compare_folders(folder1, folder2):
     """Compare the contents of folder1 to folder2."""
 
+    files = os.listdir(folder1)
+    if not files:
+        print("{0} is empty, Nothing to compare.".format(folder1))
+        return
     folders = file_map(folder2)
-    for filename1 in os.listdir(folder1):
+    for filename1 in files:
         if filename1 not in folders:
             print("new:{0}".format(filename1))
             continue
@@ -69,7 +91,17 @@ def compare_folders(folder1, folder2):
             print("update:{0}".format(filename1))
 
 
-def main():
+def compare(arg1, arg2):
+    """Compare the two arguments (both files or both folders)."""
+
+    if os.path.isfile(arg1):
+        compare_files(arg1, arg2)
+    else:
+        compare_folders(arg1, arg2)
+
+
+
+def cmdline_compare():
     """Get the command line arguments, validate and then compare."""
 
     def both_files(name1, name2):
@@ -81,10 +113,7 @@ def main():
     if len(sys.argv) == 3 and (
         both_files(sys.argv[1], sys.argv[2]) or both_folders(sys.argv[1], sys.argv[2])
     ):
-        if os.path.isfile(sys.argv[1]):
-            compare_files(sys.argv[1], sys.argv[2])
-        else:
-            compare_folders(sys.argv[1], sys.argv[2])
+        compare(sys.argv[1], sys.argv[2])
     else:
         script = os.path.basename(sys.argv[0])
         msg = "Usage: python {0} file1 file2\n  or python {0} folder1 folder2"
@@ -92,5 +121,14 @@ def main():
         print(usage)
 
 
+def config_compare():
+    """Compare the two objects in the Config."""
+
+    compare(Config.download_pdfs, Config.pds_pdfs)
+
+
 if __name__ == "__main__":
-    main()
+    if Config.use_config:
+        config_compare()
+    else:
+        cmdline_compare()
