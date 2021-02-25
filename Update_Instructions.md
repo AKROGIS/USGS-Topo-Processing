@@ -146,7 +146,7 @@ subsequent scripts.
 
 - Generate list of new geotif raster compare download list to existing tif in
   the PDS.  Updated tiles do not require adding rasters (just metadata)
-  - Add new rasters (if any) to mosaics
+  - Run `add_rasters_to_mosaics.py` to add new rasters (if any) to mosaics
 - Update footprints with any new or updated metadata
   - Compare git history to see if metadata has changed
   - Update manuallY??
@@ -245,19 +245,19 @@ already in the footprints
   - import csv23.py
   - use Config class and not CONFIG dict.
 - Finish this document
-- Rename `arrange_topos.py` to `organize_downloads.py`
+- In `organize_downloads.py`
   - Fix code.  It should move files from `WD\Download` folders to
     a `WD` folder that matches the PDS (See discussion above)
   - Finish code and test
 - Cleanup `create_gdal_batchfile.py` script
   - build from columns in metadata and files in `WD\CurrentGeoPDF` folder
 - Fix/Test mosaic scripts
-  1) add new rasters to mosaic (`build_mosaics.py` -> `add_rasters_to_mosaics.py`)
+  1) `add_rasters_to_mosaics.py`
   2) update raster mosaic footprint attributes from metadata files.
 - New script to check mosaic footprints with PDS raster files  (see discussion above)
 - Move `compare_trees.py` to misc scripts
-- Rename `pdf_diff.py` to `compare_files.py` and document above (process step 2)
 - rename andthis folder and reclone the repo
+- Document `compare_files.py` above (process step 2)
 - Test all the scripts with Python 2 and 3 (Repo should not change)
 - Run the process from start to finish with latest database download
 

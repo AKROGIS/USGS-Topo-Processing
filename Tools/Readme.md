@@ -14,14 +14,14 @@ see the [Update Instructions](Update_Instructions.md).
 
   **TO DO:** Needs cleanup.
 
-* `arrange_topos.py`
+* `organize_downloads.py`
 
   Put topos in correct folder structure. This will move the files in the various
   `Download` folders to the PDS folder structure in the working directory.
 
   **TO DO:** Needs finishing and cleanup. Rename to `organize_downloads.py`
 
-* `build_mosaics.py`
+* `add_rasters_to_mosaics.py`
 
   Add new aster images to the mosaic data sets.
 
@@ -67,7 +67,7 @@ well documented maintainable scripts (above).
   Compares the local directories to the PDS directories, and prints a
   list of files that are new, deleted, and updated.
 
-* `pdf_diffs.py`
+* `compare_files.py`
 
   Compares contents of a newly downloaded PDF files with existing PDF files by
   using a file hash. The USGS database may indicate that a map has been
