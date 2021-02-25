@@ -3,7 +3,7 @@
 This folder contains Python scripts used to collect, organize, categorize,
 process, and maintain the data in the sibling folders, and derived
 products like statewide mosaics.  For appropriate use of these scripts
-see the [Update Instructions](Update_Instructions.md).
+see the [Update Instructions](../Update_Instructions.md).
 
 * `add_pyramids.bat`
 
@@ -15,9 +15,15 @@ see the [Update Instructions](Update_Instructions.md).
 
 * `add_rasters_to_mosaics.py`
 
-  Add new aster images to the mosaic data sets.
-
-  **TO DO:** Needs cleanup.
+  Determines if any rasters exist that need to be added to the mosaic, and then
+  adds them. It also prints a list of rasters in the mosaic with broken links
+  (no file in the PDS).  It compares the mosaic to the PDS files, so it needs to
+  be run after the PDS has been updated. It does not need to be run if you know
+  that there are no new rasters (i.e. no new historical topos, and all current
+  files are updates to tiles already in the mosaic), but it doesn't hurt to run.
+  If new rasters are added, then the mosaic footprint shape and attributes
+  will need to be updated (see instructions in
+  [Update Instructions](../Update_Instructions.md)).
 
 * `compare_files.py`
 
@@ -40,10 +46,12 @@ see the [Update Instructions](Update_Instructions.md).
 
 * `create_gdal_batchfile.py`
 
-  looks for GeoPDF files without a newer GeoTIFF file and creates a
-  batch file of GDAL commands to create the missing GeoTIFF files.
-
-  **TO DO:** Needs cleanup.
+  Looks in the `Current_GeoPDF` folder for any files without a newer matching
+  file in `Current_GeoTIFF` file and creates any missing destination sub folders
+  as well as a batch file of GDAL commands to create the missing GeoTIFF files.
+  The correct GeoTIFF name and path is determined by finding the `PDS Path` in
+  the `Indexes/all_metadata_topo.csv` file and replacing the X drive prefix with
+  the working folder.
 
 * `csv23.py`
 
@@ -65,7 +73,7 @@ see the [Update Instructions](Update_Instructions.md).
 * `organize_downloads.py`
 
   Moves the files in the `Downloads` folders into the correct folder structure
-  within one of the `CurrentGeoPDF` or `Historical_*` folders. The correct path
+  within one of the `Current_GeoPDF` or `Historical_*` folders. The correct path
   is determined by finding the `PDS Path` in the matching
   `Indexes/all_metadata_*.csv` file and replacing the X drive prefix with the
   working folder.
