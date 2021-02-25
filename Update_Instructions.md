@@ -247,7 +247,6 @@ already in the footprints
   - build from columns in metadata and files in `WD\CurrentGeoPDF` folder
 - Fix/Test `add_rasters_to_mosaics.py`
 - New script to check mosaic footprints with PDS raster files  (see discussion above)
-- Move `compare_trees.py` to misc scripts
 - Document `compare_files.py` above (process step 2)
 
 - Test all the scripts with Python 2 and 3 (Repo should not change)

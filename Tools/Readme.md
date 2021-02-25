@@ -67,11 +67,6 @@ process steps.  The first update (end of 2020) was an ad hoc effort that
 used a number of small scripts (below) that eventually made it into a few
 well documented maintainable scripts (above).
 
-* `compare_trees.py`
-
-  Compares the local directories to the PDS directories, and prints a
-  list of files that are new, deleted, and updated.
-
 * `compare_files.py`
 
   Compares contents of a newly downloaded PDF files with existing PDF files by
