@@ -26,21 +26,28 @@ import csv
 import os
 import sys
 
-CONFIG = {
+
+class Config(object):
+    """Namespace for configuration parameters. Edit as needed."""
+
+    # pylint: disable=useless-object-inheritance,too-few-public-methods
+
     # The working folder where input/output files can be found
     # This is the root folder of the cloned code repository.
-    "work_folder": "B:\\work\\USGS-Topo-Processing",
+    work_folder = "B:\\work\\USGS-Topo-Processing"
+
     # 'work_folder': '/Users/regan/MyRepos/USGS-Topo-Processing',
     # metadata_folder is where the metadata files exist
     # if None, the metadata files are assumed to be in the work_folder
-    "metadata_folder": "Indexes",
+    metadata_folder = "Indexes"
+
     # metadata files to check
     # file is the name of the file
     # column is the name of the column with a PDS path
     # raster is the name of the column with the raster name.  It should only
     # be used with the list of current topos, and is used to check the list of
     # raster files generated from the list of GeoPDFs (in column)
-    "metadata_files": [
+    metadata_files = [
         {
             "file": "all_metadata_topo.csv",
             "column": "PDS Path",
@@ -62,8 +69,7 @@ CONFIG = {
             "file": "all_metadata_itm.csv",
             "column": "PDS Path",
         },
-    ],
-}
+    ]
 
 
 def check_metadata_paths():
@@ -100,9 +106,9 @@ def get_paths_and_folders():
 
     metadata_paths = set()
     pds_folders = set()
-    root = CONFIG["work_folder"]
-    metadata_folder = os.path.join(root, CONFIG["metadata_folder"])
-    for metadata in CONFIG["metadata_files"]:
+    root = Config.work_folder
+    metadata_folder = os.path.join(root, Config.metadata_folder)
+    for metadata in Config.metadata_files:
         file_name = metadata["file"]
         file_path = os.path.join(metadata_folder, file_name)
         path_column = metadata["column"]

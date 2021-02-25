@@ -17,23 +17,29 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 import os
 import re
 
-CONFIG = {
+class Config(object):
+    """Namespace for configuration parameters. Edit as needed."""
+
+    # pylint: disable=useless-object-inheritance,too-few-public-methods
+
     # The working folder where input/output files can be found
     # This is the root folder of the cloned code repository.
-    "work_folder": "B:\\work\\USGS-Topo-Processing",
+    work_folder = "B:\\work\\USGS-Topo-Processing"
+
     # 'work_folder': '/Users/regan/MyRepos/USGS-Topo-Processing',
     # metadata_folder is where the metadata files exist
     # if None, the metadata files are assumed to be in the work_folder
-    "metadata_folder": "Indexes",
-    "download_folders": "Downloads",
-    "pds_folders": None,
+    metadata_folder = "Indexes"
+    download_folders = "Downloads"
+    pds_folders = None
+
     # downloaded files to move
     # file is the name of the file
     # column is the name of the column with a PDS path
     # raster is the name of the column with the raster name.  It should only
     # be used with the list of current topos, and is used to check the list of
     # raster files generated from the list of GeoPDFs (in column)
-    "moves": [
+    moves = [
         {
             "download_folder": "ITM",
             "pds_folder": "Historic_ITM",
@@ -52,8 +58,8 @@ CONFIG = {
                 "metadata": "all_metadata_topo.csv",
             },
         },
-    ],
-}
+    ]
+
 
 
 """
