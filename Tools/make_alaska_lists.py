@@ -471,7 +471,9 @@ def make_lists():
 
     # write the processing datestamp
     with open(datestamp_file, "w", encoding="utf-8") as datestamp_h:
-        now = datetime.date.today().isoformat()
+        # Python2: date.isofortmat() returns str, but io.open.write() want unicode
+        # coerce to unicode by concatinating with an empty unicode string
+        now = "" + datetime.date.today().isoformat()
         datestamp_h.write(now)
 
 
