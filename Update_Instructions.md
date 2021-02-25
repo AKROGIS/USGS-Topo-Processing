@@ -123,14 +123,14 @@ subsequent scripts.
 
 2. Find/Remove duplicate PDFs
    Sometimes USGS updates just the GeoPDF metadata, which makes it look like the
-   map is new, when infact there is no change in the PDF contents.  First
+   map is new, when in fact there is no change in the PDF contents.  First
    run `compare_file.py` to see if the downloaded PDFs are the same or different
    keep the different files and remove the duplicates.
 
 3. Convert GeoPDFs to GeoTIFFs
-  - run `create_gdal_batchfile.py`
-  - run generated batch file (break into chunks)
-  - run `add_pyramids.bat`
+   - run `create_gdal_batchfile.py`
+   - run generated batch file (break into chunks)
+   - run `add_pyramids.bat`
 
 ## Publish
 
@@ -144,7 +144,7 @@ subsequent scripts.
 
 ### Update Mosaics
 
-- Generate list of new geotif raster compare download list to existing tif in
+- Generate list of new GeoTIFF raster compare download list to existing tif in
   the PDS.  Updated tiles do not require adding rasters (just metadata)
   - Run `add_rasters_to_mosaics.py` to add new rasters (if any) to mosaics
 - Update footprints with any new or updated metadata
@@ -155,16 +155,16 @@ subsequent scripts.
   - we can match based on raster name
   - Do we need any attributes for the Current topos?
   - Historic topos are unlikely to change
-    - handle small discret changes manually
+    - handle small discrete changes manually
     - large changes with kill and fill (bulk erase and update all attributes)
 
- - We will track `Scale`, `Map Folder`, `Create Date`, `PDS Path` and
+- We will track `Scale`, `Map Folder`, `Create Date`, `PDS Path` and
    `Date on Map` from `all_metadate_topo.csv`
    where `Version` == `Current` (not `Historical`)
    in `X:\Mosaics\Statewide\Charts\USGS_Topo_Maps.gdb\Current_1to25k`
    Link on the `Raster Name` == `Name`
 
- - Historical footprints are joined to the metadata with the following
+- Historical footprints are joined to the metadata with the following
    geoprocessing command.  If there is a major update, a similar command can
    be used to do a bulk update.  Minor changes (as seen in any changes to the
    metadata files in the git diff) will need to be done manually.  None are
@@ -174,22 +174,25 @@ subsequent scripts.
    ```Python
    arcpy.JoinField_management(in_data="C:/tmp/pds/topos/USGS_Topo_Maps.gdb/Historic_1to250k_Bathymetry", in_field="Name", join_table="C:/tmp/pds/topos/meta.gdb/all_metadata_qm", join_field="Raster_Name", fields="Series;Version;Cell_ID;Map_Name;Primary_State;Scale;Date_On_Map;Imprint_Year;Woodland_Tint;Visual_Version_Number;Photo_Inspection_Year;Photo_Revision_Year;Aerial_Photo_Year;Edit_Year;Field_Check_Year;Survey_Year;Datum;Projection;Advance;Preliminary;Provisional;Interim;Planimetric;Special_Printing;Special_Map;Shaded_Relief;Orthophoto;Pub_USGS;Pub_Army_Corps_Eng;Pub_Army_Map;Pub_Forest_Serv;Pub_Military_Other;Pub_Reclamation;Pub_War_Dept;Pub_Bur_Land_Mgmt;Pub_Natl_Park_Serv;Pub_Indian_Affairs;Pub_EPA;Pub_Tenn_Valley_Auth;Pub_US_Commerce;Keywords;Map_Language;Scanner_Resolution;Cell_Name;Primary_State_Name;N_Lat;W_Long;S_Lat;E_Long;Link_to_HTMC_Metadata;Download_GeoPDF;View_FGDC_Metadata_XML;View_Thumbnail_Image;Scan_ID;GDA_Item_ID;Create_Date;Byte_Count;Grid_Size;Download_Product_S3;View_Thumbnail_Image_S3;NRN;NSN;Map_Folder;AWS_URL;PDS_Path")
    ```
-To recreate the footprints.
-* Create a new mosaic - See original processing for details
+
+To recreate the footprints:
+
+- Create a new mosaic - See original processing for details
   - Add Rasters
   - Fix footprints
   - Add columns from manual inspections (`Indexes\*_data.csv`)
-* Add columns from USGS (`Indexes\all_metadata_*.csv`)
+- Add columns from USGS (`Indexes\all_metadata_*.csv`)
   - Add CSV file to a geodatabase
   - Use Join Fields GP tool
   - Join on `Mosaic.Name` = `CSV.Raster_Name`
   - Exclude at least fields `OBJECTID` and `Raster_Name` (more for current topo)
 
-To update all the manual or USGS Columns
-* Use Delete Fields GP tool to remove all columns to the right
+To update all the manual or USGS Columns:
+
+- Use Delete Fields GP tool to remove all columns to the right
   - Starting with `Series` and `Version` for USGS data
   - Starting with columns after `UriHash` for manual data
-* Use `Join Fields` GP Tool as above to add attributes as above.
+- Use `Join Fields` GP Tool as above to add attributes as above.
 
 To add data to just the new topo rasters, create a limited CSV from
 `Indexes\all_metadata_*.csv` that has only the records for the new rasters
@@ -211,7 +214,7 @@ already in the footprints
 
 - Run `WD\Tools\compare_pds_to_metadata.py` again.  The output should be
 
-    ```
+    ```sh
     Woot, Woot!, No Extra Paths
     Woot, Woot!, No Extra Files
     ```
@@ -233,14 +236,8 @@ already in the footprints
   - updated metadata files and download lists
 - Update publish date in mosaic metadata
 
-
 # TO DO
 
-- Add CSV metadata attributes mosaic footprints
-- Create properly filtered ITM mosaic
-- Create metadata (Item description) for mosaics
-- Create Layer files
-- Publish layer files in TM
 - Cleanup Python code to match current conventions
   - import csv23.py
   - use Config class and not CONFIG dict.
@@ -251,13 +248,10 @@ already in the footprints
   - Finish code and test
 - Cleanup `create_gdal_batchfile.py` script
   - build from columns in metadata and files in `WD\CurrentGeoPDF` folder
-- Fix/Test mosaic scripts
-  1) `add_rasters_to_mosaics.py`
-  2) update raster mosaic footprint attributes from metadata files.
+- Fix/Test `add_rasters_to_mosaics.py`
 - New script to check mosaic footprints with PDS raster files  (see discussion above)
 - Move `compare_trees.py` to misc scripts
-- rename andthis folder and reclone the repo
 - Document `compare_files.py` above (process step 2)
+
 - Test all the scripts with Python 2 and 3 (Repo should not change)
 - Run the process from start to finish with latest database download
-
