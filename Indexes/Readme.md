@@ -28,7 +28,7 @@ altered as needed to include any map that bled into the marginalia.
 ## `all_metadata_{itm|qq|qm|topo}.csv`
 
 Metadata for each file in the category in the name.  These files are created
-with the [make_alaska_lists script](../Tools/make_alaska_lists.py) from the
+with the `../Tools/make_alaska_lists.py` script from the
 downloaded USGS database.  The data in these files has been added to the
 respective raster mosaic datasets in order to describe, sort and filter the
 tiles in each mosaic. The veracity of some attributes is suspect, for example,
