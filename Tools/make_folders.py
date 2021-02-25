@@ -75,15 +75,15 @@ def make__missing_folders():
 
 def remove_tree(path):
     """Recursively remove an existing path. Silently ignores path not found.
-    
+
     Python 2/3 compatible.
     May throw OSError, IOError, shutil.Error
     """
     if sys.version_info[0] < 3:
         try:
             shutil.rmtree(path)
-        except OSError as e:
-            if e.errno != errno.ENOENT:
+        except OSError as ex:
+            if ex.errno != errno.ENOENT:
                 raise
     else:
         try:
@@ -94,15 +94,15 @@ def remove_tree(path):
 
 def make_dir(path):
     """Make a directory if it does not exist. Silently ignores existing path.
-    
+
     Python 2/3 compatible.
     May throw OSError, IOError.
     """
     if sys.version_info[0] < 3:
         try:
             os.mkdir(path)
-        except OSError as e:
-            if e.errno != errno.EEXIST:
+        except OSError as ex:
+            if ex.errno != errno.EEXIST:
                 raise
     else:
         try:
