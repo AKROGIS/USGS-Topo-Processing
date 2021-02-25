@@ -42,7 +42,7 @@ def file_map(folder):
     results = {}
     for root, _, names in os.walk(folder):
         for name in names:
-            results[name] = root.replace(folder + "\\", "")
+            results[name] = root.replace(folder, "")
     return results
 
 
