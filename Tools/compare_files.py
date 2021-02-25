@@ -84,7 +84,9 @@ def main():
         else:
             compare_folders(sys.argv[1], sys.argv[2])
     else:
-        usage = "Usage: {0} file1 file2\n  or {0} folder1 folder2".format(sys.argv[0])
+        script = os.path.basename(sys.argv[0])
+        msg = "Usage: python {0} file1 file2\n  or python {0} folder1 folder2"
+        usage = msg.format(script)
         print(usage)
 
 
