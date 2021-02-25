@@ -43,8 +43,8 @@ class Config(object):
     # folders will be created in the order given and deleted in the opposite
     # order, so put sub folders after parent folders.
     folder_list = [
-        "CurrentGeoPDF",
-        "CurrentGeoTIFF",
+        "Current_GeoPDF",
+        "Current_GeoTIFF",
         "Historical_QM",
         "Historical_ITM",
         "Historical_QQ",
