@@ -10,9 +10,8 @@ see the [Update Instructions](Update_Instructions.md).
   A DOS batch file to run [GDAL](https://gdal.org) commands to add pyramids to
   all GeoTIFFs in a folder tree. This should only be run on a folder with new
   files. It does not clear any existing pyramids, and does not check for
-  existing pyramids.
-
-  **TO DO:** Needs cleanup.
+  existing pyramids.  You must initialize the GDAL command line environment
+  before running this script (see the comment in the script for details.)
 
 * `csv23.py`
 
@@ -31,6 +30,16 @@ see the [Update Instructions](Update_Instructions.md).
   Add new aster images to the mosaic data sets.
 
   **TO DO:** Needs cleanup.
+
+* `compare_files.py`
+
+  Uses file hashing to compares the contents of a folder of newly downloaded PDF
+  files with the folder of existing PDF files. the paths to the two folders are
+  provide on the command line. The folder of new downloads should be provided
+  first. The USGS database may indicate that updated, however this may mean that
+  only the metadata was updated while the PDF content is unchanged.  This script
+  will identify the PDFs that are actually "updated" and those that are
+  "duplicates" and can be deleted.
 
 * `compare_pds_to_metadata.py`
 
@@ -59,18 +68,3 @@ see the [Update Instructions](Update_Instructions.md).
   but are assumed by other steps in the processing scripts.  This script should
   be run after cloning the repo to a new work folder, or when reprocessing
   in a work folder used previously to process new topo maps.
-
-## Additional tools
-
-Tools that may yet be of value if they are cleaned up and documented in the
-process steps.  The first update (end of 2020) was an ad hoc effort that
-used a number of small scripts (below) that eventually made it into a few
-well documented maintainable scripts (above).
-
-* `compare_files.py`
-
-  Compares contents of a newly downloaded PDF files with existing PDF files by
-  using a file hash. The USGS database may indicate that a map has been
-  updated, however this may mean that only the metadata was updated
-  while the PDF content is unchanged.  This will identify "updated"
-  topos that actually have no change to the PDF file.
