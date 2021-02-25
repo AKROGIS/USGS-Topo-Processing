@@ -2,7 +2,8 @@
 SETLOCAL ENABLEEXTENSIONS
 SETLOCAL ENABLEDELAYEDEXPANSION
 
-REM to use GDAL commands you must first run the command C:\users\resarwas\gdal\SDKShell.bat
+REM This script adds overviews to all the *.tif files below the current folder
+REM to use GDAL commands you must first run SDKShell.bat from the GDAL folder
 
 FOR /R %%f in  (*.tif) DO (
     SET "src=%%f"
