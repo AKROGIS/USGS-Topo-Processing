@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Creates and/or clears a set of subfolders
+Deletes and/or creates a set of subfolders.
 
 Edit (or at least review) the Config properties before running.
 
@@ -30,16 +30,18 @@ class Config(object):
     work_folder = "B:\\work\\USGS-Topo-Processing"
 
     # Should any existing subfolder be deleted?
-    # Typically set to True, however False bay be helpful during testing,
+    # Typically set to True, however False may be helpful during testing,
     # or in atypical situations.
     delete_folders = True
 
     # Should the missing subfolders be created?
-    # Typically set to True, however False bay be helpful during testing,
+    # Typically set to True, however False may be helpful during testing,
     # or to clean the repo when done.
     create_folders = True
 
-    # The list of folders to clear/create; will be done in the work_folder
+    # The list of folders to delete/create; will be done in the work_folder
+    # folders will be created in the order given and deleted in the opposite
+    # order, so put sub folders after parent folders.
     folder_list = [
         "CurrentGeoPDF",
         "CurrentGeoTIFF",
@@ -55,8 +57,8 @@ class Config(object):
     ]
 
 
-def clear_existing_folders():
-    """Removed existing sub folders listed in the Config object."""
+def delete_existing_folders():
+    """Remove existing sub folders listed in the Config object."""
 
     root = Config.work_folder
     for folder in reversed(Config.folder_list):
@@ -65,7 +67,7 @@ def clear_existing_folders():
 
 
 def make__missing_folders():
-    """Creates missing sub folders listed in the Config object."""
+    """Create missing sub folders listed in the Config object."""
 
     root = Config.work_folder
     for folder in Config.folder_list:
@@ -113,6 +115,6 @@ def make_dir(path):
 
 if __name__ == "__main__":
     if Config.delete_folders:
-        clear_existing_folders()
+        delete_existing_folders()
     if Config.create_folders:
         make__missing_folders()
