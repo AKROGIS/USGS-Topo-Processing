@@ -5,6 +5,9 @@ prepared for the PDS.  It has continued value, because it identifies the files
 that required special consideration because they did not match the norm, or
 were incorrectly described by USGS.
 
+*Python scripts mentioned in this document can be found in the commit history
+of the Tools folder.**
+
 ## Current Topos (1:25k maps)
 
 1) Search the national map to create a download list
@@ -66,30 +69,7 @@ were incorrectly described by USGS.
    - Right Click, Optimize->Build overviews (uncheck Define Missing Overviews)
    - Copy to the PDS, and repair all paths to point to the PDS
 7) Future Maintenance
-   - Search the national map for files newer than the last download
-     - Same search filter as above, but using the advanced Search Options, set
-       the `Last Update` Start Date > previous search.  Repeat for `Date
-       Created`
-   - Run `make_uget_list.py`, and download new maps
-   - Some may only have newer metadata, so before doing lots of processing, use
-     `pdf_diff.py` to check if the new files are actually different than
-     existing files.
-   - Merge the new search results with the old search results.
-     - Run `merge_search_results.py`, but check/edit the configuration settings
-       at the beginning of the script.
-   - Organize new PDFs as above
-   - Compare file system to search results as above
-   - Create new GeoTIFFS as above
-   - Merge files with X drive
-     - updated TIFF tiles will over write existing tiles
-   - Update mosaic
-     - mosaic does not need to be edited for updates to existing tile
-     - new source tiles will need to be added to the mosaic
-       - see instructions above, including updating the overviews.
-     - See the readme files for the IFSAR mosaics
-       (X:\Extras\AKR\Statewide\DEM\SDMI_IFSAR\_README) for details on how
-       to update the overviews without regenerating all the overviews (to
-       minimize the burden on robocopy)
+   See [UpdateInstructions](Update_Instructions.md) for details.
 
 ## Historic QM Quads (1:250k maps)
 
@@ -228,7 +208,7 @@ Same process as for QM Quads above, except as noted below.
   - AK_Stepovak Bay C-5 and C-6_359335_1963_63360_geo
   - AK_Stepovak Bay C-5 and C-6_359336_1963_63360_geo
 - The following maps have the incorrect name (so they got the wrong clipping
-  footprint, and 3 of the four are goereferenced to the location of the
+  footprint, and 3 of the four are georeferenced to the location of the
   incorrect name.  The cell name in `itm_data.csv` was corrected, and where
   necessary, the file was correctly georeferenced as above.
   - AK_Baird Mountains D-3_354191_1955_63360_geo is actually D-4
@@ -347,7 +327,7 @@ NAD83.
    feature class `Cell_Polygons_Historic_WGS84` in `NPS_Processing_Data.gdb`.
    The cell names were modified to have WGS84 appended.  It is important to
    distinguish by cell name, because the import footprint tool applies to all
-   rasters (there is no way to only import a subset)  
+   rasters (there is no way to only import a subset)
 
     - Historic_QQ
       - AK_Saint George Island East_353770_2001_25000_geo.tif - DATUM: "World Geodetic System 1984"

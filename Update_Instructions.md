@@ -160,7 +160,7 @@ subsequent scripts.
 
  - We will track `Scale`, `Map Folder`, `Create Date`, `PDS Path` and
    `Date on Map` from `all_metadate_topo.csv`
-   where `Version` == `Current` (not `Historical`) 
+   where `Version` == `Current` (not `Historical`)
    in `X:\Mosaics\Statewide\Charts\USGS_Topo_Maps.gdb\Current_1to25k`
    Link on the `Raster Name` == `Name`
 
@@ -196,6 +196,14 @@ To add data to just the new topo rasters, create a limited CSV from
 try filtering by `Create Date` or matching on the download list.  Then follow
 the instructions above for `Join Fields`, but only select the fields that are
 already in the footprints
+
+- mosaic does not need to be edited for updates to existing tile
+- new source tiles will need to be added to the mosaic
+  - see instructions above, including updating the overviews.
+- See the readme files for the IFSAR mosaics
+  (X:\Extras\AKR\Statewide\DEM\SDMI_IFSAR\_README) for details on how
+  to update the overviews without regenerating all the overviews (to
+  minimize the burden on robocopy)
 
 ### Update repo/PDS documentation
 
