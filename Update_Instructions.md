@@ -136,7 +136,7 @@ subsequent scripts.
 
 ### Update Libraries (Copy to PDS)
 
-  Manually copy `WD` folders to PDS.  Current_GeoPDF should all be additive
+  Manually copy `WD` folders to PDS.  `Current_GeoPDF` should all be additive
   If there is a warning that you will be replacing files, stop and figure out
   why.  You may be replacing files in `Current_GeoTIF`, If so, there should be
   multiple GeoPDFs for this tile.  It is unlikely that there will be future
@@ -146,7 +146,9 @@ subsequent scripts.
 
 - Generate list of new GeoTIFF raster compare download list to existing tif in
   the PDS.  Updated tiles do not require adding rasters (just metadata)
-  - Run `add_rasters_to_mosaics.py` to add new rasters (if any) to mosaics
+  - Run `add_rasters_to_mosaics.py` (see readme for a description of behavior)
+  - update footprint shape for any new rasters
+  - fix or delete any extra broken links in the mosaic.
 - Update footprints with any new or updated metadata
   - Compare git history to see if metadata has changed
   - Update manuallY??
@@ -225,10 +227,6 @@ already in the footprints
   territory and you will need to troubleshoot the problem on your own. See the
   suggestions above in Step 6 of the *Discover* section.
 
-- New script to check footprints in mosaics with the list of files in the PDS
-  1) missing footprints for existing rasters
-  2) broken links: missing rasters for existing footprints.
-
 ## Document
 
 - Commit changes to repo
@@ -239,15 +237,12 @@ already in the footprints
 # TO DO
 
 - Finish this document
-- In `organize_downloads.py`
+- Fix `organize_downloads.py` (see Readme)
   - Fix code.  It should move files from `WD\Download` folders to
     a `WD` folder that matches the PDS (See discussion above)
   - Finish code and test
-- Cleanup `create_gdal_batchfile.py` script
+- Fix `create_gdal_batchfile.py` (see Readme)
   - build from columns in metadata and files in `WD\CurrentGeoPDF` folder
-- Fix/Test `add_rasters_to_mosaics.py`
-- New script to check mosaic footprints with PDS raster files  (see discussion above)
-- Document `compare_files.py` above (process step 2)
+- Fix `add_rasters_to_mosaics.py` (see Readme)
 
 - Test all the scripts with Python 2 and 3 (Repo should not change)
-- Run the process from start to finish with latest database download
