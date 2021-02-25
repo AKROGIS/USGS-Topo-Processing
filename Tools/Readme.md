@@ -13,18 +13,6 @@ see the [Update Instructions](Update_Instructions.md).
   existing pyramids.  You must initialize the GDAL command line environment
   before running this script (see the comment in the script for details.)
 
-* `csv23.py`
-
-  A module for safely reading and writing CSV files that may contain non-ASCII
-  characters in a way that is compatible with both Python 2 and Python 3.
-
-* `organize_downloads.py`
-
-  Put topos in correct folder structure. This will move the files in the various
-  `Download` folders to the PDS folder structure in the working directory.
-
-  **TO DO:** Needs finishing and cleanup. Rename to `organize_downloads.py`
-
 * `add_rasters_to_mosaics.py`
 
   Add new aster images to the mosaic data sets.
@@ -57,6 +45,11 @@ see the [Update Instructions](Update_Instructions.md).
 
   **TO DO:** Needs cleanup.
 
+* `csv23.py`
+
+  A module for safely reading and writing CSV files that may contain non-ASCII
+  characters in a way that is compatible with both Python 2 and Python 3.
+
 * `make_alaska_lists.py`
 
   Reads a downloaded snapshot of the USGS database (as CSV) and creates the
@@ -68,3 +61,11 @@ see the [Update Instructions](Update_Instructions.md).
   but are assumed by other steps in the processing scripts.  This script should
   be run after cloning the repo to a new work folder, or when reprocessing
   in a work folder used previously to process new topo maps.
+
+* `organize_downloads.py`
+
+  Moves the files in the `Downloads` folders into the correct folder structure
+  within one of the `CurrentGeoPDF` or `Historical_*` folders. The correct path
+  is determined by finding the `PDS Path` in the matching
+  `Indexes/all_metadata_*.csv` file and replacing the X drive prefix with the
+  working folder.
