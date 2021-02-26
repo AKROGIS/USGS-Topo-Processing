@@ -62,7 +62,10 @@ def file_map(folder):
     results = {}
     for root, _, names in os.walk(folder):
         for name in names:
-            results[name] = root.replace(folder, "")
+            sub_folder = root.replace(folder, "")
+            if sub_folder.startswith(os.path.sep):
+                sub_folder = sub_folder[1:]
+            results[name] = sub_folder
     return results
 
 
@@ -74,12 +77,13 @@ def compare_folders(folder1, folder2):
         print("{0} is empty, Nothing to compare.".format(folder1))
         return
     folders = file_map(folder2)
+    # print(folders)
     for filename1 in files:
         if filename1 not in folders:
             print("new:{0}".format(filename1))
             continue
         folder = os.path.join(folder2, folders[filename1])
-        # print(f2, folder)
+        # print(folder2, folder)
         filename2 = os.path.join(folder, filename1)
         # print(filename1, filename2)
         if not os.path.exists(filename2):
