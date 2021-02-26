@@ -20,53 +20,32 @@ class Config(object):
 
     # The working folder where input/output files can be found
     # This is the root folder of the cloned code repository.
-    work_folder = "B:\\work\\USGS-Topo-Processing"
+    work_folder = "C:\\tmp\\USGS-Topo-Processing"
 
-    # 'work_folder': '/Users/regan/MyRepos/USGS-Topo-Processing',
-    # metadata_folder is where the metadata files exist
-    # if None, the metadata files are assumed to be in the work_folder
-    metadata_folder = "Indexes"
-    download_folders = "Downloads"
-    pds_folders = None
+    # The Alaska Region PDS (X drive) folder where the USGS topo maps will be permanently archived.
+    # this must match the path in make_alaska_list.py and the therefore the
+    # beginning of the values in the `pds_path_column_name` (below)
+    pds_root = "X:\\Extras\\AKR\\Statewide\\Charts\\USGS_Topo"
 
-    # downloaded files to move
-    # file is the name of the file
-    # column is the name of the column with a PDS path
-    # raster is the name of the column with the raster name.  It should only
-    # be used with the list of current topos, and is used to check the list of
-    # raster files generated from the list of GeoPDFs (in column)
-    moves = [
-        {
-            "download_folder": "ITM",
-            "pds_folder": "Historic_ITM",
-            "subfolder_name": {
-                "column": "Map Folder",
-                "metadata": "all_metadata_itm.csv",
-            },
-        },
-        {"download_folder": "QM", "pds_folder": "Historic_QM", "subfolder_name": None},
-        {"download_folder": "QQ", "pds_folder": "Historic_QQ", "subfolder_name": None},
-        {
-            "download_folder": "TOPO",
-            "pds_folder": "Current_GeoPDF",
-            "subfolder_name": {
-                "column": "Map Folder",
-                "metadata": "all_metadata_topo.csv",
-            },
-        },
-    ]
+    # The name of the additional column in all metadata files that contains the
+    # path to the file in the PDS. This must match the name of the column in
+    # Config.addon_column_names in the make_alaska_list.py script.
+    pds_path_column_name = "PDS Path"
 
-
-"""
-for all files in QQ and QM move to
-for all files in ITM move to Historic
-"""
-
-folders_to_fix = [("Historic_ITM", ".itf"), ("Current_GeoPDF", ".pdf")]
+    # A dictionary wherein the keys are the names of the download folders
+    # (relative to the `work_folder`) and the values are the names of the
+    # related metadata files (relative to the `work_folder`).
+    download_metadata = {
+        "Downloads/ITM": "Indexes/all_metadata_itm.csv",
+        "Downloads/QM": "Indexes/all_metadata_qm.csv",
+        "Downloads/QQ": "Indexes/all_metadata_qq.csv",
+        "Downloads/TOPO": "Indexes/all_metadata_topo.csv",
+    }
 
 
 def get_folder_names(files, kind):
     """Return the name of the folder a topo map should be in."""
+
     if kind == ".tif":
         regex = re.compile(r"AK_([A-Za-z ]+)( [A-D]-[0-8]|_).*")
     else:
@@ -90,6 +69,8 @@ def get_folder_names(files, kind):
 
 def main():
     """Move topo maps into the appropriate sub folder."""
+
+    folders_to_fix = [("Historic_ITM", ".itf"), ("Current_GeoPDF", ".pdf")]
     for topo_folder, topo_ext in folders_to_fix:
         if not os.path.isdir(topo_folder):
             print('Could not find the folder: "{0}", Skipping'.format(topo_folder))
