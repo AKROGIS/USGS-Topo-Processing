@@ -1,9 +1,11 @@
 # -*- coding: utf-8 -*-
 """
-Print the results of comparing two folders or files.
+Print the results of comparing two folders or two files.
 
 Folders are compared by comparing all the files within.  Files are compared
-by md5 hash results.
+by md5 hash results.  If two folders are given, each of the files in
+folder1 are compared with the same named file in folder2.  Any extra files in
+folder2 are ignored.
 
 Folder or file names to compare are provide as Config options, or as command
 line arguments, See Config. Results are printed to the standard out (console).
@@ -30,7 +32,7 @@ class Config(object):
     # The working folder where input/output files can be found
     work_folder = "C:\\tmp\\USGS-Topo-Processing"
 
-    # The location of the downloaded GeoPDFs, 
+    # The location of the downloaded GeoPDFs,
     download_pdfs = os.path.join(work_folder, "Downloads\\TOPO")
 
     # The Alaska Region PDS (X drive) folder where the existing GeoPDFs
