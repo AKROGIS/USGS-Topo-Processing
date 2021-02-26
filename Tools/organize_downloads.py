@@ -9,8 +9,10 @@ Works with Python 2.7 and 3.6+
 
 from __future__ import absolute_import, division, print_function, unicode_literals
 
+import csv
 import os
-import re
+
+import csv23
 
 
 class Config(object):
@@ -42,69 +44,52 @@ class Config(object):
         "Downloads/TOPO": "Indexes/all_metadata_topo.csv",
     }
 
+    # If `dry_run` is true, then no files will be moved, instead the move
+    # instruction will be printed to the standard output.
+    dry_run = True
 
-def get_folder_names(files, kind):
-    """Return the name of the folder a topo map should be in."""
 
-    if kind == ".tif":
-        regex = re.compile(r"AK_([A-Za-z ]+)( [A-D]-[0-8]|_).*")
-    else:
-        regex = re.compile(r"AK_([A-Za-z_]+)_[A-D]-[0-8]_(OE|[SN][WE])_.*")
+def get_paths(metadata):
+    """Return a dictionary with the new path for each filename in the metadata file."""
 
-    file_folders = {}
-    for filename in files:
-        try:
-            folder = regex.search(filename).group(1)
-        except AttributeError:
-            print("WARNING: Unable to determine folder name for {0}".format(filename))
-            folder = None
-        if folder is not None:
-            if kind == ".pdf":
-                folder = folder.replace("_", " ")
-            if folder not in file_folders:
-                file_folders[folder] = []
-            file_folders[folder].append(filename)
-    return file_folders
+    file_paths = {}
+    csv_path = os.path.join(Config.work_folder, metadata)
+    with csv23.open(csv_path, "r") as csv_file:
+        csv_reader = csv.reader(csv_file)
+        header = csv23.fix(next(csv_reader))
+        # Get pds path index; fail hard if not found
+        pds_path_index = header.index(Config.pds_path_column_name)
+        for row in csv_reader:
+            row = csv23.fix(row)
+            pds_path = row[pds_path_index]
+            local_path = pds_path.replace(Config.pds_root, Config.work_folder)
+            filename = os.path.basename(local_path)
+            file_paths[filename] = local_path
+    return file_paths
 
 
 def main():
-    """Move topo maps into the appropriate sub folder."""
+    """Move downloaded topo maps into the appropriate sub folder."""
 
-    folders_to_fix = [("Historic_ITM", ".itf"), ("Current_GeoPDF", ".pdf")]
-    for topo_folder, topo_ext in folders_to_fix:
-        if not os.path.isdir(topo_folder):
-            print('Could not find the folder: "{0}", Skipping'.format(topo_folder))
-        else:
-            print('Organizing files in "{0}"'.format(topo_folder))
-        new_files = [
-            topo for topo in os.listdir(topo_folder) if topo.lower().endswith(topo_ext)
-        ]
-        if new_files:
-            print("  Found {0} new files.".format(len(new_files)))
-            folders = get_folder_names(new_files, topo_ext)
-            for topo in sorted(folders):
-                # print("  Processing folder {0}".format(topo))
-                files = folders[topo]
-                folder = os.path.join(topo_folder, topo)
+    for download_folder in Config.download_metadata:
+        filenames = os.listdir(download_folder)
+        if not filenames:
+            print("{0} is empty, nothing to move.".format(download_folder))
+            continue
+        metadata_file = Config.download_metadata[download_folder]
+        paths = get_paths(metadata_file)
+        download_path = os.path.join(Config.work_folder, download_folder)
+        for filename in filenames:
+            old_path = os.path.join(download_path, filename)
+            new_path = paths[filename]
+            if Config.dry_run:
+                print("move {0} to {1}.".format(old_path, new_path))
+            else:
                 try:
-                    os.mkdir(folder)
+                    os.rename(old_path, new_path)
                 except OSError as ex:
-                    if os.path.exists(folder):
-                        pass
-                    else:
-                        raise ex
-                for name in files:
-                    src = os.path.join(topo_folder, name)
-                    dst = os.path.join(folder, name)
-                    # print("    Moving {0} to {1}.".format(src, dst))
-                    try:
-                        os.rename(src, dst)
-                    except OSError as ex:
-                        print(
-                            "    Failed to move {0} to {1}.  Reason: {2}".format(
-                                src, dst, ex
-                            )
-                        )
+                    msg = "    Failed to move {0} to {1}.  Reason: {2}"
+                    print(msg.format(old_path, new_path, ex))
 
 
 if __name__ == "__main__":
