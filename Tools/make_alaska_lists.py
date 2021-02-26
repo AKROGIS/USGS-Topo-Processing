@@ -121,6 +121,11 @@ class Config(object):
         "itm": "Historic_ITM",
     }
 
+    # The names of additional columns of data that will be created and added
+    # to the end of the metadata file. The creation of the content for these
+    # columns is baked into the script, but the column names is configurable.
+    addon_column_names = ["Map Folder", "Raster Name", "AWS URL", "PDS Path"]
+
 
 def skip(row, row_filter):
     """
@@ -299,7 +304,8 @@ def is_new_row(row):
 
 def patch_header(header):
     """Adds additional columns to a US Topo Header."""
-    return header + ["Map Folder", "Raster Name", "AWS URL", "PDS Path"]
+
+    return header + Config.addon_column_names
 
 
 def patch_row(row, url, kind):
