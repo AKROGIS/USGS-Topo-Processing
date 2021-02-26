@@ -46,7 +46,7 @@ class Config(object):
 
     # If `dry_run` is true, then no files will be moved, instead the move
     # instruction will be printed to the standard output.
-    dry_run = True
+    dry_run = False
 
 
 def get_paths(metadata):
@@ -63,6 +63,8 @@ def get_paths(metadata):
             row = csv23.fix(row)
             pds_path = row[pds_path_index]
             local_path = pds_path.replace(Config.pds_root, Config.work_folder)
+            # Only for testing on a unix like system
+            local_path = local_path.replace("\\", "/")
             filename = os.path.basename(local_path)
             file_paths[filename] = local_path
     return file_paths
@@ -72,21 +74,27 @@ def main():
     """Move downloaded topo maps into the appropriate sub folder."""
 
     for download_folder in Config.download_metadata:
-        filenames = os.listdir(download_folder)
+        download_path = os.path.join(Config.work_folder, download_folder)
+        filenames = os.listdir(download_path)
         if not filenames:
             print("{0} is empty, nothing to move.".format(download_folder))
             continue
         metadata_file = Config.download_metadata[download_folder]
         paths = get_paths(metadata_file)
-        download_path = os.path.join(Config.work_folder, download_folder)
         for filename in filenames:
             old_path = os.path.join(download_path, filename)
-            new_path = paths[filename]
+            try:
+                new_path = paths[filename]
+            except KeyError:
+                msg = "ERROR: {0} not found in {1}. Skipping."
+                print(msg.format(filename, metadata_file))
+                continue
             if Config.dry_run:
                 print("move {0} to {1}.".format(old_path, new_path))
             else:
                 try:
-                    os.rename(old_path, new_path)
+                    # os.renames will create intermediate directories as needed.
+                    os.renames(old_path, new_path)
                 except OSError as ex:
                     msg = "    Failed to move {0} to {1}.  Reason: {2}"
                     print(msg.format(old_path, new_path, ex))
