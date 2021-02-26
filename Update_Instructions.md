@@ -1,9 +1,9 @@
 # USGS Topo Map Processing Instructions
 
 These instructions are for updating the USGS topographic map library
-and mosaics maintained in the Alaska GIS PDS.  These instructions
-look for changes by the USGS since the last time this process was
-run and update the published products accordingly.
+and raster mosaics maintained in the Alaska GIS PDS.  The process is to
+look for changes made by the USGS since the last time this process was
+run and then update the published products accordingly.
 
 ## Discover
 
@@ -23,29 +23,31 @@ it is possible that USGS might update a map's metadata without updating the
 map.  Therefore it might be beneficial to update all records with the latest
 database download, even if the map itself did not change.
 
-1. Clone (or refresh) the git repository to a working directory
+1. Clone (or refresh) the git repository to a local working directory
 
-   - <https://github.com/AKROGIS/USGS-Topo-Processing>
-   - The working directory (e.g. `C:\tmp\topo`) is referred to as `WD` below.
-   - The working directory should be on a fast local volume with 10s of free GB
-     - Each map is at least 10MB, and there may be 1000 or more to process.
-   - Check/Edit `working_folder` in the `Config` properties in
-     `Tools\make_folders.py`
-   - Check the other `Config` properties.
-   - Run the script `Tools\make_folders.py`to create working folders
+   - Use GitHub desktop application or the git command line to clone
+     <https://github.com/AKROGIS/USGS-Topo-Processing> to a working directory.
+   - The working directory is referred to as `WD` in the instructions below.
+   - The working directory should be a fast local volume with 10s of free GBs.
+     - Each map is at least 10MB, and there may be a 1000 or more to process.
+   - The scripts assume the `WD` is `C:\tmp\USGS-Topo-Processing`. If you cloned
+     the repo to a different location, then either move it, or edit the `Config`
+     properties in all the scripts in `WD\Tools`.
+   - Run the script `WD\Tools\make_folders.py` to create working folders in
+     the cloned repo.
 
 2. Download the USGS database snapshot.
 
    - URL: <http://thor-f5.er.usgs.gov/ngtoc/metadata/misc/topomaps_all.zip>
-   - Referencing web page (as of Nov. 2020):
+   - Referencing web page (as of Feb. 2021):
      <https://www.usgs.gov/core-science-systems/ngp/tnm-delivery/topographic-maps>
 
 3. Unzip the download to the `WD\Scratch` folder
 
    - There should be 3 files in this folder (1 readme, and 2 CSV files)
 
-4. Check the check the `Change History:` at the end of `WD\Scratch\readme.txt`
-   in the unzip folder for changes that might effect the scripts. For example
+4. Check the `Change History:` at the end of `WD\Scratch\readme.txt`
+   for changes that might effect the scripts. For example
    adding or deleting columns in the data file.  If there have been changes,
    then any of the scripts below may fail.  If so, then the scripts will need
    to be updated to reflect the changes. In most cases, there is a `Config`
@@ -57,9 +59,10 @@ database download, even if the map itself did not change.
    - Check and update the `Config` properties at the beginning of
      `WD\Tools\make_alaska_lists.py`
    - Check the file containing the date of the last processing.
-     - see `Config`, but typically `Indexes\last_processing_date.txt`
+     - see `Config`, but typically `WD\Indexes\last_processing_date.txt`
      - If this file does not exist, then it is assumed NO topo file have been
-       previously downloaded.
+       previously downloaded. If it is missing it can be recreated.  The content
+       looks like `2021-02-23`
    - Run `WD\Tools\make_alaska_lists.py` to create the download lists and
      metadata records for the mosaics.
 
@@ -71,16 +74,16 @@ database download, even if the map itself did not change.
      metadata files.
    - There should be no **Extra Files (in PDS but not metadata)**
    - Everything in **Extra Paths (in metadata, but not PDS)** except
-     the paths in `Current_GeoTIFF` should be in one of the
+     the paths in `WD\Current_GeoTIFF` should be in one of the
      `WD\Indexes\new_downloads_*.txt` files.  If this is not the case, then
      something has gone wrong.  This problem should be investigated and
      resolved before continuing.
    - Possible sources of error include (by likelihood):
-     - The `Config` properties in `WD\Tools\make_alaska_lists.py`.
-     - Other assumptions in `WD\Tools\make_alaska_lists.py`.
+     - The `Config` properties in `WD\Tools\make_alaska_lists.py` are wrong.
+     - Other assumptions in `WD\Tools\make_alaska_lists.py` are wrong.
      - Changes (deleting or renaming files) on the PDS since the last
        processing.
-     - Changes in the structure or semantics of the USGS database
+     - Changes in the structure or semantics of the USGS database.
 
 7. Update the repo.
 
@@ -90,14 +93,14 @@ database download, even if the map itself did not change.
    dates and file lists of prior updates.
 
    It appears that the order of the maps in the USGS download is not consistent
-   so there may be some changes in the `Indexes\all_metadata_*.csv` files that
-   is just the order of select lines.  These changes can be ignored (you
+   so there may be some changes in the `WD\Indexes\all_metadata_*.csv` files
+   that is just the order of select lines.  These changes can be ignored (you
    do not need to copy to the PDS, or commit to the repo.)
 
 8. Done?
 
-   If all the the files `Indexes\new_downloads_*.txt` are empty, you are done!
-   Otherwise, continue on.
+   If all the the files `WD\Indexes\new_downloads_*.txt` are empty, you are
+   done! Otherwise, continue on.
 
 ## Download
 
@@ -126,7 +129,7 @@ subsequent scripts.
 1. Find/remove duplicate PDFs
 
    **This must be done before the next step because it assumes the files are
-   still in the `Downloads` folder.**
+   still in the `WD\Downloads\TOPO` folder.**
 
    Sometimes USGS updates just the metadata for a GeoPDF. This makes it look
    like an updated map, so we download it, only to find out the map content is
@@ -136,13 +139,14 @@ subsequent scripts.
    - Check and update the `Config` properties at the beginning of
      `WD\Tools\compare_file.py`
    - Run `WD\Tools\compare_file.py` to identify the duplicate files.
-   - Delete all files in `WD\Downloads\TOPO` that are marked with `dup:`; keep
-     all files marked with `update:`. If there are a lot of intermixed files to
-     delete, copy past the output into a text editor and search and replace
-     `dup:` with `delete `, `new:` with `REM ` and `update:` with `REM `, then
-     save as a `*.bat` file and execute in the `WD\Downloads\TOPO` folder.
+   - Delete all files in `WD\Downloads\TOPO` that the script output marks with
+     `dup:`; keep all files marked with `update:` or `new:`. If there are a lot
+     of intermixed files to delete, copy/paste the output into a text editor and
+     search and replace `dup:` with `delete `, `new:` with `REM ` and `update:`
+     with `REM `, then save as a `*.bat` file and execute in the
+     `WD\Downloads\TOPO` folder.
 
-2. Put topos in correct folder structure
+2. Put topos in the correct folder structure
 
    This will move the files in the various `WD\Download` folders to
    the PDS folder structure in `WD`.  This will make it easier to copy to the
@@ -154,7 +158,7 @@ subsequent scripts.
 
 3. Convert GeoPDFs to GeoTIFFs
 
-    This step will create a GEOTIFF for each of the new GeoPDFs, and then add
+    This step will create a GEOTIFF for each of the new GeoPDFs and then add
     overviews to all new GeoTIFFs.
 
    - Check and update the `Config` properties at the beginning of
@@ -165,7 +169,7 @@ subsequent scripts.
      file is short, or you have a lot of time, you can run the file as is,
      otherwise, you can break the file into n evenly sized chunks, where n is
      the number of CPUs/cores on your computer. Each chunk can be run
-     concurrently in a separate DOS command window in speed up the processing.
+     concurrently in a separate DOS command window to speed up the processing.
    - To run the GDAL batch script you will need to open a DOS command window, or
      a Windows Power Shell.  Before you can execute the GDAL Batch script, you
      need to execute `SDKShell.bat` in the `GDAL` installation folder.
@@ -182,9 +186,11 @@ subsequent scripts.
 ### Update Libraries (Copy to PDS)
 
   Manually copy the folders `WD\Current_GeoPDF`, `WD\Current_GeoTIFF`,
-  `WD\Historical_ITM`, `WD\Historical_QM`, `WD\Historical_QQ`, and `WD\Indexes`
+  `WD\Historic_ITM`, `WD\Historic_QM`, `WD\Historic_QQ`, and `WD\Indexes`
   to the PDS (`X:\Extras\AKR\Statewide\Charts\USGS_Topo`). You can skip a folder
-  if it is empty.
+  if it is empty.  **IMPORTANT** The contents of the local folders is incomplete
+  and needs to be _merged_ with the existing content on the PDS.  Do not delete
+  or replace the PDS folders with these local folders.
   
   `Current_GeoPDF` should all be additive. If there is a warning that you will
   be replacing files, stop and figure out why.  You may be replacing files in
@@ -281,7 +287,7 @@ already in the footprints
 
 # TO DO
 
-- Finish this document
+- Finish this document (just the mosaic section)
 - Fix `organize_downloads.py` (see Readme)
   - Fix code.  It should move files from `WD\Download` folders to
     a `WD` folder that matches the PDS (See discussion above)
