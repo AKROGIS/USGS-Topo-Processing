@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 """
-Reads a USGS database snapshot and creates lists of Alaska Topo Maps
+Reads a USGS database snapshot and creates lists of Alaska Topo Maps.
 
-Edit the CONFIG object to set execution options and change assumptions
+Review/edit the Config properties before executing.
 
 Works with Python 2.7 and 3.6+
 """

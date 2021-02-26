@@ -1,15 +1,10 @@
 # -*- coding: utf-8 -*-
 """
-This script moves new topo maps into the appropriate sub folder.
+This script moves downloaded topo maps into the PDS folder structure.
 
-The sub folder is the base name of the topo (typically the 1:250k name)
-if the sub folder does not exist it is created.
-it can be run after an initial bulk download, or an incremental update.
+Review/edit the Config properties before executing.
 
-Warning; this script uses hard coded relative paths,
-and must be run in the 'USGS_Topos' folder.
-
-Assumes python 2.7
+Works with Python 2.7 and 3.6+
 """
 
 from __future__ import absolute_import, division, print_function, unicode_literals
