@@ -28,7 +28,7 @@ class Config(object):
     use_config = True
 
     # The working folder where input/output files can be found
-    work_folder = "B:\\Work\\USGS-Topo-Processing"
+    work_folder = "C:\\tmp\\USGS-Topo-Processing"
 
     # The location of the downloaded GeoPDFs, 
     download_pdfs = os.path.join(work_folder, "Downloads\\TOPO")

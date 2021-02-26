@@ -24,7 +24,7 @@ class Config(object):
     # pylint: disable=useless-object-inheritance,too-few-public-methods
 
     # The working folder where input/output files can be found
-    work_folder = "B:\\work\\USGS-Topo-Processing"
+    work_folder = "C:\\tmp\\USGS-Topo-Processing"
     #'work_folder': '/Users/regan/MyRepos/USGS-Topo-Processing',
 
     # The USGS database snapshot from the downloaded zip file
