@@ -112,35 +112,74 @@ subsequent scripts.
 
 ## Process
 
-2. Find/Remove duplicate PDFs
-   Sometimes USGS updates just the GeoPDF metadata, which makes it look like the
-   map is new, when in fact there is no change in the PDF contents.  First
-   run `compare_file.py` to see if the downloaded PDFs are the same or different
-   keep the different files and remove the duplicates.
+1. Find/remove duplicate PDFs
+
+   **This must be done before the next step because it assumes the files are
+   still in the `Downloads` folder.**
+
+   Sometimes USGS updates just the metadata for a GeoPDF. This makes it look
+   like an updated map, so we download it, only to find out the map content is
+   unchanged.  This step identifies any of the downloaded GeoPDFs that have not
+   actually changed.
+
+   - Check and update the `Config` properties at the beginning of
+     `WD\Tools\compare_file.py`
+   - Run `WD\Tools\compare_file.py` to identify the duplicate files.
+   - Delete all files in `WD\Downloads\TOPO` that are marked with `dup:`; keep
+     all files marked with `update:`. If there are a lot of intermixed files to
+     delete, copy past the output into a text editor and search and replace
+     `dup:` with `delete `, `new:` with `REM ` and `update:` with `REM `, then
+     save as a `*.bat` file and execute in the `WD\Downloads\TOPO` folder.
 
 2. Put topos in correct folder structure
 
    This will move the files in the various `WD\Download` folders to
-   the PDS folder structure in `WD`
+   the PDS folder structure in `WD`.  This will make it easier to copy to the
+   PDS.
 
-   - Check and update the `CONFIG` object at the beginning of
+   - Check and update the `Config` properties at the beginning of
      `WD\Tools\organize_downloads.py`
    - Run `WD\Tools\organize_downloads.py` to move the files.
 
 3. Convert GeoPDFs to GeoTIFFs
-   - run `create_gdal_batchfile.py`
-   - run generated batch file (break into chunks)
-   - run `add_pyramids.bat`
+
+    This step will create a GEOTIFF for each of the new GeoPDFs, and then add
+    overviews to all new GeoTIFFs.
+
+   - Check and update the `Config` properties at the beginning of
+     `WD\Tools\create_gdal_batchfile.py`
+   - Run `WD\Tools\create_gdal_batchfile.py` to create a GDAL batch script.
+   - Open the output script in a text editor and determine how many lines are
+     in the file.  Each line will take about 5-15 minutes to execute.  If the
+     file is short, or you have a lot of time, you can run the file as is,
+     otherwise, you can break the file into n evenly sized chunks, where n is
+     the number of CPUs/cores on your computer. Each chunk can be run
+     concurrently in a separate DOS command window in speed up the processing.
+   - To run the GDAL batch script you will need to open a DOS command window, or
+     a Windows Power Shell.  Before you can execute the GDAL Batch script, you
+     need to execute `SDKShell.bat` in the `GDAL` installation folder.
+   - After all portions of the GDAL batch script are done executing, you should
+     have the same number of new GeoTIFFs in `WD\Current_GeoTIFF` as there are
+     new GeoPDFs in `WD\Current_GeoPDF`.
+   - Open a CMD window and execute `SDKShell.bat` in the `GDAL` installation
+     folder (or use the command window from the previous step).
+   - In the command window, change directory (`cd`) to `WD\Current_GeoTIFF`
+   - In the command window, execute `WD\Tools\add_pyramids.bat`
 
 ## Publish
 
 ### Update Libraries (Copy to PDS)
 
-  Manually copy `WD` folders to PDS.  `Current_GeoPDF` should all be additive
-  If there is a warning that you will be replacing files, stop and figure out
-  why.  You may be replacing files in `Current_GeoTIF`, If so, there should be
-  multiple GeoPDFs for this tile.  It is unlikely that there will be future
-  changes to the `Historic` folders, so review any changes closely.
+  Manually copy the folders `WD\Current_GeoPDF`, `WD\Current_GeoTIFF`,
+  `WD\Historical_ITM`, `WD\Historical_QM`, `WD\Historical_QQ`, and `WD\Indexes`
+  to the PDS (`X:\Extras\AKR\Statewide\Charts\USGS_Topo`). You can skip a folder
+  if it is empty.
+  
+  `Current_GeoPDF` should all be additive. If there is a warning that you will
+  be replacing files, stop and figure out why.  You may be replacing files in
+  `Current_GeoTIF`, If so, there should be multiple GeoPDFs for this tile.  It
+  is unlikely that there will be future changes to the `Historic` folders,
+  so review any changes closely.
 
 ### Update Mosaics
 
@@ -229,9 +268,6 @@ already in the footprints
 
 ## Document
 
-- Commit changes to repo
-  - new download date
-  - updated metadata files and download lists
 - Update publish date in mosaic metadata
 
 # TO DO
