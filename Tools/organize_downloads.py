@@ -70,7 +70,7 @@ def get_paths(metadata):
             pds_path = row[pds_path_index]
             local_path = pds_path.replace(Config.pds_root, Config.work_folder)
             # Only for testing on a unix like system
-            local_path = local_path.replace("\\", "/")
+            # local_path = local_path.replace("\\", "/")
             filename = os.path.basename(local_path)
             file_paths[filename] = local_path
     return file_paths
