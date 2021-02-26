@@ -45,9 +45,9 @@ class Config(object):
     folder_list = [
         "Current_GeoPDF",
         "Current_GeoTIFF",
-        "Historical_QM",
-        "Historical_ITM",
-        "Historical_QQ",
+        "Historic_QM",
+        "Historic_ITM",
+        "Historic_QQ",
         "Scratch",
         "Downloads",
         "Downloads/QQ",
