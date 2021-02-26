@@ -29,9 +29,9 @@ database download, even if the map itself did not change.
    - The working directory (e.g. `C:\tmp\topo`) is referred to as `WD` below.
    - The working directory should be on a fast local volume with 10s of free GB
      - Each map is at least 10MB, and there may be 1000 or more to process.
-   - Check/Edit `working_folder` in the `CONFIG` object in
+   - Check/Edit `working_folder` in the `Config` properties in
      `Tools\make_folders.py`
-   - Check the other parameters in the `CONFIG` object.
+   - Check the other `Config` properties.
    - Run the script `Tools\make_folders.py`to create working folders
 
 2. Download the USGS database snapshot.
@@ -48,16 +48,16 @@ database download, even if the map itself did not change.
    in the unzip folder for changes that might effect the scripts. For example
    adding or deleting columns in the data file.  If there have been changes,
    then any of the scripts below may fail.  If so, then the scripts will need
-   to be updated to reflect the changes. In most cases, there is a `CONFIG`
+   to be updated to reflect the changes. In most cases, there is a `Config`
    object at the beginning of the script that contains assumptions about the
-   database. Most changes can be made per the comments in the `CONFIG` object.
+   database. Most changes can be made per the comments in the `Config` object.
 
 5. Make the download lists
 
-   - Check and update the `CONFIG` object at the beginning of
+   - Check and update the `Config` properties at the beginning of
      `WD\Tools\make_alaska_lists.py`
    - Check the file containing the date of the last processing.
-     - see `CONFIG`, but typically `Indexes\last_processing_date.txt`
+     - see `Config`, but typically `Indexes\last_processing_date.txt`
      - If this file does not exist, then it is assumed NO topo file have been
        previously downloaded.
    - Run `WD\Tools\make_alaska_lists.py` to create the download lists and
@@ -65,7 +65,7 @@ database download, even if the map itself did not change.
 
 6. Check the metadata against PDS and download lists
 
-   - Check and update the `CONFIG` object at the beginning of
+   - Check and update the `Config` properties at the beginning of
      `WD\Tools\compare_pds_to_metadata.py`
    - Run `WD\Tools\compare_pds_to_metadata.py` to compare the PDS with the
      metadata files.
@@ -76,17 +76,28 @@ database download, even if the map itself did not change.
      something has gone wrong.  This problem should be investigated and
      resolved before continuing.
    - Possible sources of error include (by likelihood):
-     - The `CONFIG` parameters in `WD\Tools\make_alaska_lists.py`.
+     - The `Config` properties in `WD\Tools\make_alaska_lists.py`.
      - Other assumptions in `WD\Tools\make_alaska_lists.py`.
      - Changes (deleting or renaming files) on the PDS since the last
        processing.
      - Changes in the structure or semantics of the USGS database
 
 7. Update the repo.
+
    The previous step will update various files in the `WD\Indexes` folder
    This history is retained in the repository.  Use git (or GitHub app) to
    commit and push the changes. You can use the git commit log to see the
    dates and file lists of prior updates.
+
+   It appears that the order of the maps in the USGS download is not consistent
+   so there may be some changes in the `Indexes\all_metadata_*.csv` files that
+   is just the order of select lines.  These changes can be ignored (you
+   do not need to copy to the PDS, or commit to the repo.)
+
+8. Done?
+
+   If all the the files `Indexes\new_downloads_*.txt` are empty, you are done!
+   Otherwise, continue on.
 
 ## Download
 
@@ -102,7 +113,7 @@ step).
 
 Each of the download lists (if not empty) should be downloaded to a
 separate folder for processing. The following are suggested folder names.
-If different folders are used, be sure to correct the `CONFIG` section of
+If different folders are used, be sure to correct the `Config` properties of
 subsequent scripts.
 
 - `WD\Indexes\new_downloads_qq.txt` => `WD\Downloads\QQ`
@@ -181,6 +192,8 @@ subsequent scripts.
   is unlikely that there will be future changes to the `Historic` folders,
   so review any changes closely.
 
+  Be sure to update the PDS change log!
+
 ### Update Mosaics
 
 - Generate list of new GeoTIFF raster compare download list to existing tif in
@@ -249,7 +262,7 @@ already in the footprints
   to update the overviews without regenerating all the overviews (to
   minimize the burden on robocopy)
 
-### Update repo/PDS documentation
+- Update publish date in mosaic metadata
 
 ## Verify
 
@@ -266,10 +279,6 @@ already in the footprints
   territory and you will need to troubleshoot the problem on your own. See the
   suggestions above in Step 6 of the *Discover* section.
 
-## Document
-
-- Update publish date in mosaic metadata
-
 # TO DO
 
 - Finish this document
@@ -280,5 +289,4 @@ already in the footprints
 - Fix `create_gdal_batchfile.py` (see Readme)
   - build from columns in metadata and files in `WD\CurrentGeoPDF` folder
 - Fix `add_rasters_to_mosaics.py` (see Readme)
-
-- Test all the scripts with Python 2 and 3 (Repo should not change)
+- Test the 3 scripts above with Python 2 and 3 (other scripts have been tested)
