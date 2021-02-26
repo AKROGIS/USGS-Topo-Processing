@@ -1,35 +1,71 @@
 # -*- coding: utf-8 -*-
 """
 Creates a file of GDAL commands to translate USGS Topo GeoPDFs to GeoTiffs
+
+It gets a list of GeoPDFs from the recent downloads after they have been
+organized into a local copy of the PDS (by `organize_downloads.py`).  The name
+of the GeoTIFF file to create is in the metadata file created with
+`make_alaska_lists.py`.  If the GeoTIFF exists and is newer than the GeoPDF,
+then it is skipped.
+
+Review/edit the Config properties before executing.
+
+Works with Python 2.7 and 3.6+
 """
 
 from __future__ import absolute_import, division, print_function, unicode_literals
 
+import csv
 from io import open
 import os
-import re
-import sys
 
-# Assumes python 2.7
-# This script looks for files in the current geopdf folder that do not have a newer
-# file with the same (actually similar) name in the current geoTIFF folder.
-# These filenames are used to create a list of GDAL commands in a DOS batch file
-#
-# Warning; this script uses hard coded relative paths,
-# and must be run in the 'USGS_Topos' folder.
+import csv23
 
 
 class Config(object):
-    """Namespace for configuration parameters."""
+    """Namespace for configuration parameters. Edit as needed."""
 
     # pylint: disable=useless-object-inheritance,too-few-public-methods
 
-    pdf_root_folder = "Current_GeoPDF"
-    tif_root_folder = "Current_GeoTIFF"
+    # The working folder where input/output files can be found
+    # This is the root folder of the cloned code repository.
+    work_folder = "C:\\tmp\\USGS-Topo-Processing"
+
+    # The Alaska Region PDS (X drive) folder where the USGS topo maps will be
+    # permanently archived. This must match the path in make_alaska_list.py
+    # and the therefore the beginning of the values in the
+    # `pds_path_column_name` (below)
+    pds_root = "X:\\Extras\\AKR\\Statewide\\Charts\\USGS_Topo"
+
+    # The name of the script file to create, relative to the current working
+    # directory, not the `work_folder`.
     output_script = "make_tiffs.bat"
-    regex = re.compile(
-        r"AK_([A-Za-z_]+)_([A-D]-[0-8])_([SN][WE]|OE_[EWNS_]*)_[0-9]{8}_TM_geo\.pdf"
-    )
+
+    # The file path in `work_folder` that has the metadata for all the GeoPDFs.
+    metadata = ("Indexes/all_metadata_topo.csv",)
+
+    # The name of the additional column in `metadata` that contains the
+    # path to the file in the PDS. This must match the name of the column in
+    # Config.addon_column_names in the make_alaska_list.py script.
+    pds_path_column_name = "PDS Path"
+
+    # The name of the additional column in `metadata` that contains the
+    # name of the raster for this tile. This must match the name of the column
+    # in Config.addon_column_names in the make_alaska_list.py script.
+    raster_name_column_name = "Raster Name"
+
+    # The extension to add to the raster name in the metadata to create a valid
+    # TIFF file name.
+    tif_extension = ".tif"
+
+    # The folder in `work_folder` that contains the GeoPDFs
+    # must match the folder name in the `PDS Name` in the `metadata`
+    geopdf_folder = "Current_GeoPDF"
+
+    # The folder in `work_folder` where the GeoTIFFs will be created.
+    geotiff_folder = "Current_GeoTIFF"
+
+    # The GDAL command to execute.  Takes two parameters pdf_path and tif_path
     cmd = (
         "gdal_translate --config GDAL_PDF_DPI 600 --config GDAL_PDF_LAYERS_OFF "
         + '"Barcode,Map_Collar,Images,Map_Frame.Terrain.Shaded_Relief,Map_Frame.'
@@ -37,64 +73,94 @@ class Config(object):
     )
 
 
-def tif_name_from_pdf_name(name):
-    """Return the name of the GeoTiff, given the name of the GeoPDF."""
+def read_metadata():
+    """Returns a mapping of GeoPDF names to GeoTIFF names.
 
-    match = Config.regex.search(name)
-    basename = match.group(1).replace("_", " ")
-    oe_spec = match.group(3).replace("_", " ")
-    return "{0} {1} {2}.tif".format(basename, match.group(2), oe_spec)
+    The keys in the returned dictionary are the filename in the `PDS Name`
+    column of the `metadata` (without the path), and the value is the
+    matching `Raster Name` (without path or extension).
+    """
+    mapping = {}
+    csv_path = os.path.join(Config.work_folder, Config.metadata)
+    with csv23.open(csv_path, "r") as csv_file:
+        csv_reader = csv.reader(csv_file)
+        header = csv23.fix(next(csv_reader))
+        # Get pds path index; fail hard if not found
+        pds_path_index = header.index(Config.pds_path_column_name)
+        # Get raster name index; fail hard if not found
+        raster_name_index = header.index(Config.raster_name_column_name)
+        for row in csv_reader:
+            row = csv23.fix(row)
+            pds_path = row[pds_path_index]
+            pdf_name = os.path.basename(pds_path)
+            raster_name = row[raster_name_index]
+            mapping[pdf_name] = raster_name
+    return mapping
 
 
-def main():
-    """Create GDAL commands."""
+def get_pdf_paths():
+    """Returns a list of paths to GeoPDFs."""
+
+    paths = []
+    for directory, _, files in os.walk(Config.geopdf_folder):
+        for filename in files:
+            path = os.path.join(directory, filename)
+            paths.append(path)
+    return paths
+
+
+def make_tif_path(pdf_path, metadata_info):
+    """Return the path of the GeoTiff, given the path of the GeoPDF.
+
+    metadata info is a dictionary where the key is a GeoPDF file name
+    (with extension, but not path), and the value is the raster name (without
+    path or extension).
+    """
+
+    pdf_folder, pdf_name = os.path.split(pdf_path)
+    tif_folder = pdf_folder.replace(Config.geopdf_folder, Config.geotiff_folder)
+    try:
+        tif_name = metadata_info[pdf_name]
+    except KeyError:
+        return None
+    tif_path = os.path.join(tif_folder, tif_name + Config.tif_extension)
+    return tif_path
+
+
+def outdated(path1, path2):
+    """Returns True if path2 does not exist, or if path1 is newer than path2."""
+
+    if not os.path.exists(path2):
+        return True
+    time1 = os.path.getmtime(path1)
+    time2 = os.path.getmtime(path2)
+    if time2 < time1:
+        return True
+    return False
+
+
+def create_script():
+    """Create a file with GDAL commands to create GeoTIFFs from GeoPDFs.
+
+    The list of GeoPDFs comes from the filesystem.  The GeoTIFFs are created
+    with the name in the metadata file in a folder mirrors the GeoPDFs.
+    """
+
+    metadata_info = read_metadata()
+    pdf_paths = get_pdf_paths()
+    commands = []
+    for pdf_path in pdf_paths:
+        tif_path = make_tif_path(pdf_path, metadata_info)
+        if tif_path is None:
+            msg = "ERROR: file {0} not found in the metadata. Skipping."
+            print(msg.format(pdf_path))
+            continue
+        if outdated(pdf_path, tif_path):
+            commands.append(Config.cmd.format(pdf_path, tif_path))
 
     with open(Config.output_script, "w", encoding="utf-8") as out_file:
-        if not os.path.isdir(Config.pdf_root_folder):
-            print(
-                'Could not find the folder: "{0}", Aborting'.format(
-                    Config.pdf_root_folder
-                )
-            )
-            sys.exit(1)
-        if not os.path.isdir(Config.tif_root_folder):
-            print(
-                'Could not find the folder: "{0}", Aborting'.format(
-                    Config.pdf_root_folder
-                )
-            )
-            sys.exit(1)
-        sub_folders = [
-            folder
-            for folder in os.listdir(Config.pdf_root_folder)
-            if os.path.isdir(os.path.join(Config.pdf_root_folder, folder))
-        ]
-        # print(sub_folders)
-        for folder in sub_folders:
-            pdf_folder = os.path.join(Config.pdf_root_folder, folder)
-            tif_folder = os.path.join(Config.tif_root_folder, folder)
-            try:
-                os.mkdir(tif_folder)
-            except OSError as ex:
-                if os.path.exists(tif_folder):
-                    pass
-                else:
-                    raise ex
-            pdfs = os.listdir(pdf_folder)
-            # tiffs = os.listdir(tif_folder)
-            for pdf in pdfs:
-                pdf_path = os.path.join(pdf_folder, pdf)
-                tif = tif_name_from_pdf_name(pdf)
-                tif_path = os.path.join(tif_folder, tif)
-                if os.path.exists(tif_path):
-                    pdf_time = os.path.getmtime(pdf_path)
-                    tif_time = os.path.getmtime(tif_path)
-                    if tif_time > pdf_time:
-                        # print("{0} is newer than {1}.  Skipping.".format(tif_path, pdf_path))
-                        continue
-                # print("building {0} from {1}.".format(tif_path, pdf_path))
-                out_file.write(Config.cmd.format(pdf_path, tif_path) + "\n")
+        out_file.lines(commands)
 
 
 if __name__ == "__main__":
-    main()
+    create_script()
