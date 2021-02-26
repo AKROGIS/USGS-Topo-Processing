@@ -44,6 +44,12 @@ class Config(object):
         "Downloads/TOPO": "Indexes/all_metadata_topo.csv",
     }
 
+    # Special trick to create folders for new GeoTIFFs. If the local path
+    # includes the first item in the tuple, a new folder (excluding the filename
+    # at the end of the local path) will be created by replacing the first item
+    # with the second item.
+    geotiff_folder = ("Current_GeoPDF", "Current_GeoTIFF")
+
     # If `dry_run` is true, then no files will be moved, instead the move
     # instruction will be printed to the standard output.
     dry_run = False
@@ -68,6 +74,24 @@ def get_paths(metadata):
             filename = os.path.basename(local_path)
             file_paths[filename] = local_path
     return file_paths
+
+
+def make_geotiff_folder(path):
+    """If path is to a GeoPDF, then create a folder for the pending GeoTIFF."""
+
+    folder = os.path.dirname(path)
+    if Config.geotiff_folder[0] in folder:
+        tiff_folder = folder.replace(Config.geotiff_folder[0], Config.geotiff_folder[1])
+        if os.path.exists(tiff_folder):
+            return
+        if Config.dry_run:
+            print("Create {0}.".format(tiff_folder))
+        else:
+            try:
+                os.mkdir(tiff_folder)
+            except OSError as ex:
+                msg = "    Failed to create {0}.  Reason: {2}"
+                print(msg.format(tiff_folder, ex))
 
 
 def main():
@@ -98,6 +122,7 @@ def main():
                 except OSError as ex:
                     msg = "    Failed to move {0} to {1}.  Reason: {2}"
                     print(msg.format(old_path, new_path, ex))
+            make_geotiff_folder(new_path)
 
 
 if __name__ == "__main__":
