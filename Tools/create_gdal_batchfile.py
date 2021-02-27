@@ -69,7 +69,7 @@ class Config(object):
     cmd = (
         "gdal_translate --config GDAL_PDF_DPI 600 --config GDAL_PDF_LAYERS_OFF "
         + '"Barcode,Map_Collar,Images,Map_Frame.Terrain.Shaded_Relief,Map_Frame.'
-        + 'Projection_and_Grids" -of GTIFF -co COMPRESS=deflate "{0}" "{1}"'
+        + 'Projection_and_Grids" -of GTIFF -co COMPRESS=deflate "{0}" "{1}"\n'
     )
 
 
