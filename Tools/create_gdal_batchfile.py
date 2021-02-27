@@ -42,7 +42,7 @@ class Config(object):
     output_script = "make_tiffs.bat"
 
     # The file path in `work_folder` that has the metadata for all the GeoPDFs.
-    metadata = ("Indexes/all_metadata_topo.csv",)
+    metadata = "Indexes/all_metadata_topo.csv"
 
     # The name of the additional column in `metadata` that contains the
     # path to the file in the PDS. This must match the name of the column in
@@ -92,6 +92,8 @@ def read_metadata():
         for row in csv_reader:
             row = csv23.fix(row)
             pds_path = row[pds_path_index]
+            # Only for testing on a unix like system
+            # pds_path = pds_path.replace("\\", "/")
             pdf_name = os.path.basename(pds_path)
             raster_name = row[raster_name_index]
             mapping[pdf_name] = raster_name
@@ -102,7 +104,8 @@ def get_pdf_paths():
     """Returns a list of paths to GeoPDFs."""
 
     paths = []
-    for directory, _, files in os.walk(Config.geopdf_folder):
+    pdf_folder = os.path.join(Config.work_folder, Config.geopdf_folder)
+    for directory, _, files in os.walk(pdf_folder):
         for filename in files:
             path = os.path.join(directory, filename)
             paths.append(path)
@@ -148,6 +151,10 @@ def create_script():
 
     metadata_info = read_metadata()
     pdf_paths = get_pdf_paths()
+    if not pdf_paths:
+        print("No GeoPDFs found. Script not necessary.")
+        return
+
     commands = []
     for pdf_path in pdf_paths:
         tif_path = make_tif_path(pdf_path, metadata_info)
@@ -158,8 +165,12 @@ def create_script():
         if outdated(pdf_path, tif_path):
             commands.append(Config.cmd.format(pdf_path, tif_path))
 
+    if not commands:
+        print("All GeoTIFFs are newer than GeoPDFs. Script not necessary.")
+        return
+
     with open(Config.output_script, "w", encoding="utf-8") as out_file:
-        out_file.lines(commands)
+        out_file.writelines(commands)
 
 
 if __name__ == "__main__":
