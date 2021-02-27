@@ -106,7 +106,6 @@ def compare(arg1, arg2):
         compare_folders(arg1, arg2)
 
 
-
 def cmdline_compare():
     """Get the command line arguments, validate and then compare."""
 

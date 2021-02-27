@@ -97,6 +97,8 @@ def check_metadata_paths():
 def get_paths_and_folders():
     """Scans the metadata files to get a set of paths and folders."""
 
+    # pylint: disable=too-many-locals
+
     metadata_paths = set()
     pds_folders = set()
     root = Config.work_folder

@@ -146,6 +146,8 @@ def skip(row, row_filter):
 def print_domains():
     """Prints all values found in selected columns.  See CONFIG for details."""
 
+    # pylint: disable=too-many-branches
+
     allfile = os.path.join(Config.work_folder, Config.usgs_file)
     column_names = Config.domain_names
     domain_filter = Config.domain_filter
@@ -193,6 +195,9 @@ def check_urls():
       and ampersands(&) are replaced by 'and'
     In US Topo Maps, spaces are replaced by '_'
     """
+
+    # pylint: disable=too-many-locals
+
     allfile = os.path.join(Config.work_folder, Config.usgs_file)
     check_filter = Config.check_filter
     row_filter = {}
@@ -338,6 +343,8 @@ def patch_row(row, url, kind):
 
 def make_lists():
     """Makes list of Alaska topo files for processing.  See CONFIG for details."""
+
+    # pylint: disable=too-many-locals,too-many-branches,too-many-statements
 
     topo_filter = Config.topo_filter
     topo_filter_indexes = {}
