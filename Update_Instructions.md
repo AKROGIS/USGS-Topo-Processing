@@ -191,7 +191,7 @@ subsequent scripts.
   if it is empty.  **IMPORTANT** The contents of the local folders is incomplete
   and needs to be _merged_ with the existing content on the PDS.  Do not delete
   or replace the PDS folders with these local folders.
-  
+
   `Current_GeoPDF` should all be additive. If there is a warning that you will
   be replacing files, stop and figure out why.  You may be replacing files in
   `Current_GeoTIF`, If so, there should be multiple GeoPDFs for this tile.  It
@@ -288,11 +288,5 @@ already in the footprints
 # TO DO
 
 - Finish this document (just the mosaic section)
-- Fix `organize_downloads.py` (see Readme)
-  - Fix code.  It should move files from `WD\Download` folders to
-    a `WD` folder that matches the PDS (See discussion above)
-  - Finish code and test
-- Fix `create_gdal_batchfile.py` (see Readme)
-  - build from columns in metadata and files in `WD\CurrentGeoPDF` folder
 - Fix `add_rasters_to_mosaics.py` (see Readme)
 - Test the 3 scripts above with Python 2 and 3 (other scripts have been tested)
