@@ -39,19 +39,20 @@ class Config(object):
     # You can also add some of the derived mosaics, but those will likely have
     # a long list of missing files, as they do not (by design) contain all maps.
     mosaic_folders = {
-        "Current_topo": "Current_GeoTIFF",
-        "Historic_itm_all": "Historic_ITM",
-        "Historic_qm_all": "Historic_QM",
-        "Historic_qq_all": "Historic_QQ",
+        "Current_1to25k": "Current_GeoTIFF",
+        "Historic_1to63360_all": "Historic_ITM",
+        "Historic_1to250k_all": "Historic_QM",
+        "Historic_1to25k_all": "Historic_QQ",
     }
 
     # The file extension for the rasters in the mosaic.  Needed to skip extras
     # files that might be found, e.g. world files, stats, pyramids, metadata, ...
     raster_extension = ".tif"
 
-    # If True it will write the results to a CSV file with the name based on the
-    # mosaic, or PDS folder. If False, the results are written to the standard
-    # output (terminal screen)
+    # If True it will write the results to CSV files with the name based on the
+    # mosaic or PDS folder. The CSV has no header, and only one column which is
+    # an absolute path to a raster data file. If False, the results are written
+    # to the standard output (terminal screen).
     create_csv = False
 
 

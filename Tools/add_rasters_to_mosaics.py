@@ -13,6 +13,25 @@ import arcpy
 import csv23
 
 
+class Config(object):
+    """Namespace for configuration parameters. Edit as needed."""
+
+    # pylint: disable=useless-object-inheritance,too-few-public-methods
+
+    # The geodatabase of raster mosaics. This must be a local copy of the
+    # master geodatabase on the PDS.
+    mosaic_database = "C:/tmp/topo/USGS_Topo_Maps.gdb"
+
+    # The matching of mosaic rasters to the CSV file of paths to add.
+    # The CSV path is relative to the current working directory.
+    # The CSV has no header, and only one column which is an absolute path
+    # to a raster data file.
+    mosaic_csv = {
+        "Current_1to25k": "unused_rasters_in_Current_GeoTIFF",
+        # "Historic_1to63360_all": "unused_rasters_in_Historic_ITM",
+    }
+
+
 def load_csv_file(csvpath):
     """Return a list of the rows in the CSV."""
 
@@ -40,6 +59,7 @@ def make_raster_list_for_mosaic(csv_data):
 
 def add_rasters_to_mosaic(fgdb, mosaic, rasters):
     """Add the list of rasters to the mosaic dataset in the fgdb."""
+
     dataset = os.path.join(fgdb, mosaic)
     arcpy.AddRastersToMosaicDataset_management(
         in_mosaic_dataset=dataset,
@@ -49,17 +69,16 @@ def add_rasters_to_mosaic(fgdb, mosaic, rasters):
     )
 
 
-def main(fgdb, mosaic, csv_file):
+def add_rasters():
     """Add the rasters in csv_file to the mosaic dataset in the fgdb."""
-    csv_data = load_csv_file(csv_file)
-    rasters = make_raster_list_for_mosaic(csv_data)
-    print("Adding {0} rasters to {1}".format(len(rasters), mosaic))
-    add_rasters_to_mosaic(fgdb, mosaic, rasters)
+
+    fgdb = Config.mosaic_database
+    for mosaic, csv_path in Config.mosaic_csv.items():
+        csv_data = load_csv_file(csv_path)
+        rasters = make_raster_list_for_mosaic(csv_data)
+        print("Adding {0} rasters to {1}".format(len(rasters), mosaic))
+        add_rasters_to_mosaic(fgdb, mosaic, rasters)
 
 
 if __name__ == "__main__":
-    main(
-        fgdb=r"C:/tmp/topo/USGS_Topo_Maps.gdb",
-        mosaic="Current_1to25k",
-        csv_file=r"new_files.txt",
-    )
+    add_rasters()
