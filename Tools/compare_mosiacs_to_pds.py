@@ -106,13 +106,15 @@ def compare():
 
     for mosaic, folder in Config.mosaic_folders.items():
         mosaic_path = os.path.join(Config.mosaic_database, mosaic)
-        mosaic_paths = get_mosaic_paths(mosaic_path)
         pds_path = os.path.join(Config.pds_root, folder)
-        broken_links = mosaic_paths - pds_paths
-        extra_rasters = pds_paths - mosaic_paths
         msg = "Comparing Mosaic: {0} to Folder: {1}"
         print(msg.format(mosaic_path, pds_path))
+        print("Reading Mosaic...")
+        mosaic_paths = get_mosaic_paths(mosaic_path)
+        print("Reading PDS...")
         pds_paths = get_pds_paths(pds_path)
+        broken_links = mosaic_paths - pds_paths
+        extra_rasters = pds_paths - mosaic_paths
         output("broken links", mosaic, broken_links)
         output("unused rasters", folder, extra_rasters)
 
