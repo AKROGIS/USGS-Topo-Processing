@@ -81,7 +81,8 @@ def get_mosaic_paths(datasource):
     with arcpy.da.SearchCursor(list_table, fields) as cursor:
         for row in cursor:
             path = row[0]
-            paths.add(path)
+            if ".Overviews\\" not in path:
+                paths.add(path)
     # Delete the temp geodatabase table
     arcpy.management.Delete(list_table)
     return paths
