@@ -15,10 +15,8 @@ see the [Update Instructions](../Update_Instructions.md).
 
 * `add_rasters_to_mosaics.py`
 
-  Determines if any rasters exist that need to be added to the mosaic, and then
-  adds them. It also prints a list of rasters in the mosaic with broken links
-  (no file in the PDS).  It compares the mosaic to the PDS files, so it needs to
-  be run after the PDS has been updated. It does not need to be run if you know
+  Adds a list of data source (raster) paths to a raster mosaic data set.
+  It does not need to be run if you know
   that there are no new rasters (i.e. no new historical topos, and all current
   files are updates to tiles already in the mosaic), but it doesn't hurt to run.
   If new rasters are added, then the mosaic footprint shape and attributes
@@ -34,6 +32,13 @@ see the [Update Instructions](../Update_Instructions.md).
   only the metadata was updated while the PDF content is unchanged.  This script
   will identify the PDFs that are actually "updated" and those that are
   "duplicates" and can be deleted.
+
+* `compare_mosaics_to_pds.py`
+  Compares the data source paths in a raster mosaic to a specific folder (and
+  sub-folders).  Can look at a set of mosaics in a file geodatabase. Results
+  can be saved in a CSV (for use with `add_rasters_to_mosaics.py`), or printed
+  to the terminal.  If used as input to `add_rasters_to_mosaics.py` it must be
+  run on the PDS folders (after the PDS has been updated).
 
 * `compare_pds_to_metadata.py`
 

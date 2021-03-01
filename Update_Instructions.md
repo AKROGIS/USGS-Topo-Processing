@@ -202,8 +202,8 @@ subsequent scripts.
 
 ### Update Mosaics
 
-- Generate list of new GeoTIFF raster compare download list to existing tif in
-  the PDS.  Updated tiles do not require adding rasters (just metadata)
+- Add missing rasters to the master mosaics
+  - Run `compare_mosaics_to_pds.py` (see readme for a description of behavior)
   - Run `add_rasters_to_mosaics.py` (see readme for a description of behavior)
   - update footprint shape for any new rasters
   - fix or delete any extra broken links in the mosaic.
