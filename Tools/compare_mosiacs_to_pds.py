@@ -40,9 +40,9 @@ class Config(object):
     # a long list of missing files, as they do not (by design) contain all maps.
     mosaic_folders = {
         "Current_1to25k": "Current_GeoTIFF",
-        "Historic_1to63360_all": "Historic_ITM",
-        "Historic_1to250k_all": "Historic_QM",
-        "Historic_1to25k_all": "Historic_QQ",
+        "Historic_1to63360_All": "Historic_ITM",
+        "Historic_1to250k_All": "Historic_QM",
+        "Historic_1to25k_All": "Historic_QQ",
     }
 
     # The file extension for the rasters in the mosaic.  Needed to skip extras
@@ -94,7 +94,7 @@ def get_scratch_table():
     index = 0
     table_name = "{0}{1}".format(base_name, index)
     temp_table = os.path.join(arcpy.env.scratchGDB, table_name)
-    while arcpy.Exists():
+    while arcpy.Exists(temp_table):
         index += 1
         table_name = "{0}{1}".format(base_name, index)
         temp_table = os.path.join(arcpy.env.scratchGDB, table_name)
@@ -108,11 +108,11 @@ def compare():
         mosaic_path = os.path.join(Config.mosaic_database, mosaic)
         mosaic_paths = get_mosaic_paths(mosaic_path)
         pds_path = os.path.join(Config.pds_root, folder)
-        pds_paths = get_pds_paths(folder)
         broken_links = mosaic_paths - pds_paths
         extra_rasters = pds_paths - mosaic_paths
         msg = "Comparing Mosaic: {0} to Folder: {1}"
         print(msg.format(mosaic_path, pds_path))
+        pds_paths = get_pds_paths(pds_path)
         output("broken links", mosaic, broken_links)
         output("unused rasters", folder, extra_rasters)
 
