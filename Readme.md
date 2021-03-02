@@ -6,11 +6,14 @@ These data are primarily snapshots of files available from the
 [Initial Process Instructions](Initial_Process_Instructions.md) for details
 on how these files were initially collected and processed and any issues
 discovered. See [Update Instructions](Update_Instructions.md) for how they are
-maintained.
+maintained. See the [To Do list](ToDo.md) for additional ways to improve these
+data.
 
 *The master copy of the documents and scripts in this folder is at
 <https://github.com/AKROGIS/USGS-Topo-Processing>.  The Github repository
-does not contain the PDF and GeoTIFF files nor the file geodatabases.*
+does not contain the PDF and GeoTIFF files nor the file geodatabases.
+The tools are designed to be run from a local clone of the repository,
+and not from the PDS, or a copy of the PDS.*
 
 **NOTE:** Most historic maps are in NAD27, while the current maps and the
 Indexes (footprints) are in NAD83.  The Alaska transform is used to re-project
