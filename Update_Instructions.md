@@ -202,73 +202,119 @@ subsequent scripts.
 
 ### Update Mosaics
 
-- Add missing rasters to the master mosaics
-  - Run `compare_mosaics_to_pds.py` (see readme for a description of behavior)
-  - Run `add_rasters_to_mosaics.py` (see readme for a description of behavior)
-  - update footprint shape for any new rasters
-  - fix or delete any extra broken links in the mosaic.
-- Update footprints with any new or updated metadata
-  - Compare git history to see if metadata has changed
-  - Update manuallY??
-  - what if there are new fields in downloaded CSV database?
-  - how do we update just the changed values?  Manual??
-  - we can match based on raster name
-  - Do we need any attributes for the Current topos?
-  - Historic topos are unlikely to change
-    - handle small discrete changes manually
-    - large changes with kill and fill (bulk erase and update all attributes)
+If there are new (not updated) rasters, then these will need to be added to the
+mosaic.  If there are other changes to the metadata, the the footprint
+attributes will need to be updated.
 
-- We will track `Scale`, `Map Folder`, `Create Date`, `PDS Path` and
-   `Date on Map` from `all_metadate_topo.csv`
-   where `Version` == `Current` (not `Historical`)
-   in `X:\Mosaics\Statewide\Charts\USGS_Topo_Maps.gdb\Current_1to25k`
-   Link on the `Raster Name` == `Name`
+#### Adding New Rasters
 
-- Historical footprints are joined to the metadata with the following
-   geoprocessing command.  If there is a major update, a similar command can
-   be used to do a bulk update.  Minor changes (as seen in any changes to the
-   metadata files in the git diff) will need to be done manually.  None are
-   expected. Summary of command below: join mosaic with csv on `Name = Raster_Name`
-   add all fields except `ObjectID` and `Raster_Name`
+It is possible that all of the downloaded rasters are just updates to existing
+cells that are already in the mosaic. Use `compare_mosaics_to_pds.py` to see
+if there are rasters in the PDS that are not in the mosaic ("unused rasters").
 
-   ```Python
-   arcpy.JoinField_management(in_data="C:/tmp/pds/topos/USGS_Topo_Maps.gdb/Historic_1to250k_Bathymetry", in_field="Name", join_table="C:/tmp/pds/topos/meta.gdb/all_metadata_qm", join_field="Raster_Name", fields="Series;Version;Cell_ID;Map_Name;Primary_State;Scale;Date_On_Map;Imprint_Year;Woodland_Tint;Visual_Version_Number;Photo_Inspection_Year;Photo_Revision_Year;Aerial_Photo_Year;Edit_Year;Field_Check_Year;Survey_Year;Datum;Projection;Advance;Preliminary;Provisional;Interim;Planimetric;Special_Printing;Special_Map;Shaded_Relief;Orthophoto;Pub_USGS;Pub_Army_Corps_Eng;Pub_Army_Map;Pub_Forest_Serv;Pub_Military_Other;Pub_Reclamation;Pub_War_Dept;Pub_Bur_Land_Mgmt;Pub_Natl_Park_Serv;Pub_Indian_Affairs;Pub_EPA;Pub_Tenn_Valley_Auth;Pub_US_Commerce;Keywords;Map_Language;Scanner_Resolution;Cell_Name;Primary_State_Name;N_Lat;W_Long;S_Lat;E_Long;Link_to_HTMC_Metadata;Download_GeoPDF;View_FGDC_Metadata_XML;View_Thumbnail_Image;Scan_ID;GDA_Item_ID;Create_Date;Byte_Count;Grid_Size;Download_Product_S3;View_Thumbnail_Image_S3;NRN;NSN;Map_Folder;AWS_URL;PDS_Path")
-   ```
+- Check and update the `Config` properties at the beginning of
+  `WD\Tools\compare_mosaics_to_pds.py`. I recommend checking all mosaic without
+  creating a CSV to see if there are any changes.
+- Run `WD\Tools\compare_mosaics_to_pds.py` to see if there are rasters to add.
 
-To recreate the footprints:
+If there are changes you are done.  Otherwise, continue
 
-- Create a new mosaic - See original processing for details
-  - Add Rasters
-  - Fix footprints
-  - Add columns from manual inspections (`Indexes\*_data.csv`)
-- Add columns from USGS (`Indexes\all_metadata_*.csv`)
-  - Add CSV file to a geodatabase
-  - Use Join Fields GP tool
-  - Join on `Mosaic.Name` = `CSV.Raster_Name`
-  - Exclude at least fields `OBJECTID` and `Raster_Name` (more for current topo)
+- Edit the `Config` properties to create CSV files and rerun.
+  You comment out the mosaics that do not have any changes.
+- Copy the mosaic from the PDS to a local work area.
+- Check and update the `Config` properties at the beginning of
+  `WD\Tools\add_rasters_to_mosaics.py`. In particular, make sure that the CSV
+  filenames are correct and the mosaic path is the local copy.
+- Run `WD\Tools\add_rasters_to_mosaics.py` to add the missing rasters.
 
-To update all the manual or USGS Columns:
+The new rasters will need to have the footprints clipped to the map content
+area. The following instructions are for the current topos.  for the historic
+topos, see the [Initial Processing Instructions](Initial_Process_Instructions.md)
 
-- Use Delete Fields GP tool to remove all columns to the right
-  - Starting with `Series` and `Version` for USGS data
-  - Starting with columns after `UriHash` for manual data
-- Use `Join Fields` GP Tool as above to add attributes as above.
+- In ArcCatalog browse to the local copy of `Current_1to25k` mosaic.
+- Right click, select `Modify`->`Import Footprints or Boundary...`
+  - target: `Footprints`
+  - Target Join Field: `Name`
+  - Input: `Indexes\MAPINDICES_Alaska_State_GDB.gdb\Cells\CellGrid_7_5minute`
+  - Input Join Field: `cell_name`
 
-To add data to just the new topo rasters, create a limited CSV from
-`Indexes\all_metadata_*.csv` that has only the records for the new rasters
-try filtering by `Create Date` or matching on the download list.  Then follow
-the instructions above for `Join Fields`, but only select the fields that are
-already in the footprints
+The new footprints need additional attributes contained in the
+`Indexes\all_metadata_*.csv` files.  Currently there is no easy way to update
+just the new footprints, so a kill and fill strategy as described below is
+recommended.
 
-- mosaic does not need to be edited for updates to existing tile
-- new source tiles will need to be added to the mosaic
-  - see instructions above, including updating the overviews.
-- See the readme files for the IFSAR mosaics
-  (X:\Extras\AKR\Statewide\DEM\SDMI_IFSAR\_README) for details on how
-  to update the overviews without regenerating all the overviews (to
-  minimize the burden on robocopy)
+The overviews may need to be updated (only for the current topos) if there
+is a noticable increase in the extents of the current coverage. (If
+existing topos are updated, this does not require updating the overviews.)
+See the readme files for the IFSAR mosaics
+(X:\Extras\AKR\Statewide\DEM\SDMI_IFSAR\_README) for details on how
+to update the overviews without regenerating all the overviews (to
+minimize the burden on robocopy)
+
+#### Updating Footprint Attributes
+
+If new footprints were added to a mosaic, or if the metadata for existing
+footprints has been updated (which can be termined by the git change detection)
+you will need to update the footrpint attributes in the mosaics.
+
+While it is possible to join the `Raster Name` attribute in the
+`Indexes\all_metadata_*.csv` files to the `Name` attribute in the mosaic
+footprints, and the do some field calculations to update selected records as
+needed, this is likely more tedious that simply deleting all the extra
+attributes, and then re-adding them, as described below.
+
+##### Current Topos
+
+- Use the `Delete Fields` GP tool to remove all columns after the `UriHash`
+  attribute.
+- Use `Join Fields` GP Tool to add attributes:
+  - Import `Indexes\all_metadata_topo.csv` into a scratch geodatabase to create
+    a geodatabase table.
+  - Join on the `Name` attribute in the footprints and the `Raster_Name`
+    attribute in the CSV data.
+  - Exclude at least fields `OBJECTID` and `Raster_Name`
+  - Add at least these attributes: `Scale`, `Map Folder`, `Create Date`,
+    `PDS Path`, `AWS URL` and `Date on Map` 
+  - Click `OK` to add the columns and data.
+
+##### Historic Topos
+
+Fortunately, these are unlikely to change, and it is possible that even if
+changes occur, they can be ignored.
+
+There are two parts to the historical footprint attributes:
+
+1) The locally and manually maintained files `Indexes\*_data.csv`
+2) The USGS metadata `Indexes\all_metadata_*.csv`
+
+These instructions are for replacing both sets of attributes, however they
+can be adapted to replacing just one or the other. The example is for the
+`ITM` mosaic only, `QM` and `QQ` are similar. 
+
+- Use the `Delete Fields` GP tool to remove all columns after the `UriHash`
+  attribute from `Historic_1to63360_All`.
+- Use `Join Fields` GP Tool to add attributes from the local data:
+  - Import `Indexes\itm_data.csv` into a scratch geodatabase to create
+    a geodatabase table.
+  - Join on the `Name` attribute in the footprints and the `Raster`
+    attribute in the CSV data.
+  - Exclude at least fields `OBJECTID` and `Raster`
+  - Click `OK` to add the columns and data.
+  - Import `Indexes\all_metadata_itm.csv` into a scratch geodatabase to create
+    a geodatabase table.
+  - Join on the `Name` attribute in the footprints and the `Raster_Name`
+    attribute in the CSV data.
+  - Exclude at least fields `OBJECTID` and `Raster_Name`
+  - Click `OK` to add the columns and data.
+- Repeat this process for the other `Historic_1to63360_*` mosaics, or
+  create the other `Historic_1to63360_*` mosaics from `Historic_1to63360_all`
+  as detailed in the
+  [Initial Processing Instructions](Initial_Process_Instructions.md)
+
+#### Publishing Mosaics
 
 - Update publish date in mosaic metadata
+- Publish the local working mosaic database to the PDS
 
 ## Verify
 
