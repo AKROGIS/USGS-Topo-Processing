@@ -27,7 +27,7 @@ class Config(object):
     # The CSV has no header, and only one column which is an absolute path
     # to a raster data file.
     mosaic_csv = {
-        "Current_1to25k": "unused_rasters_in_Current_GeoTIFF",
+        "Current_1to25k": "unused_rasters_in_Current_GeoTIFF.csv",
         # "Historic_1to63360_all": "unused_rasters_in_Historic_ITM",
     }
 
@@ -38,8 +38,6 @@ def load_csv_file(csvpath):
     records = []
     with csv23.open(csvpath, "r") as csv_file:
         csv_reader = csv.reader(csv_file)
-        # ignore the first record (header)
-        next(csv_reader)
         for row in csv_reader:
             row = csv23.fix(row)
             records.append(row)
