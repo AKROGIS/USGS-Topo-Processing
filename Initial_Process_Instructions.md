@@ -5,8 +5,8 @@ prepared for the PDS.  It has continued value, because it identifies the files
 that required special consideration because they did not match the norm, or
 were incorrectly described by USGS.
 
-*Python scripts mentioned in this document can be found in the commit history
-of the Tools folder.**
+**Python scripts mentioned in this document can be found in the commit history
+of the Tools folder (see tag v1.0 - November 2020).**
 
 ## Current Topos (1:25k maps)
 
