@@ -244,7 +244,7 @@ just the new footprints, so a kill and fill strategy as described below is
 recommended.
 
 The overviews may need to be updated (only for the current topos) if there
-is a noticable increase in the extents of the current coverage. (If
+is a noticeable increase in the extents of the current coverage. (If
 existing topos are updated, this does not require updating the overviews.)
 See the readme files for the IFSAR mosaics
 (X:\Extras\AKR\Statewide\DEM\SDMI_IFSAR\_README) for details on how
@@ -254,8 +254,8 @@ minimize the burden on robocopy)
 #### Updating Footprint Attributes
 
 If new footprints were added to a mosaic, or if the metadata for existing
-footprints has been updated (which can be termined by the git change detection)
-you will need to update the footrpint attributes in the mosaics.
+footprints has been updated (which can be determined by the git change detection)
+you will need to update the footprint attributes in the mosaics.
 
 While it is possible to join the `Raster Name` attribute in the
 `Indexes\all_metadata_*.csv` files to the `Name` attribute in the mosaic
@@ -274,7 +274,7 @@ attributes, and then re-adding them, as described below.
     attribute in the CSV data.
   - Exclude at least fields `OBJECTID` and `Raster_Name`
   - Add at least these attributes: `Scale`, `Map Folder`, `Create Date`,
-    `PDS Path`, `AWS URL` and `Date on Map` 
+    `PDS Path`, `AWS URL` and `Date on Map`
   - Click `OK` to add the columns and data.
 
 ##### Historic Topos
@@ -289,7 +289,7 @@ There are two parts to the historical footprint attributes:
 
 These instructions are for replacing both sets of attributes, however they
 can be adapted to replacing just one or the other. The example is for the
-`ITM` mosaic only, `QM` and `QQ` are similar. 
+`ITM` mosaic only, `QM` and `QQ` are similar.
 
 - Use the `Delete Fields` GP tool to remove all columns after the `UriHash`
   attribute from `Historic_1to63360_All`.
@@ -330,9 +330,3 @@ can be adapted to replacing just one or the other. The example is for the
 - If that is not the problem, then I'm sorry, but you are in unexpected
   territory and you will need to troubleshoot the problem on your own. See the
   suggestions above in Step 6 of the *Discover* section.
-
-# TO DO
-
-- Finish this document (just the mosaic section)
-- Fix `add_rasters_to_mosaics.py` (see Readme)
-- Test the 3 scripts above with Python 2 and 3 (other scripts have been tested)
