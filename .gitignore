@@ -7,6 +7,5 @@ Historic_QQ/
 Scratch/
 *.gdb/
 
-.vscode
 .DS_Store
 *.pyc

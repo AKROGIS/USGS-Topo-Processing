@@ -178,7 +178,7 @@ Same process as for QM Quads above, except as noted below.
   and we only want the GeoTIFF.
 - The following maps have incorrect georeferencing.  Most are correct at the
   lower right corner, but slightly too small.  The ArcGIS georeferencing Tools
-  was used to create a new aux file and twfx (the mosaic uses only the aux file)
+  was used to create a new aux file and tfwx (the mosaic uses only the aux file)
   - AK_Anchorage B-6_463478_1960_63360_geo
   - AK_Baird Inlet A-7_354117_1954_63360_geo
   - AK_Baird Inlet C-2_463533_1954_63360_geo
